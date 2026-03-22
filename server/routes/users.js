@@ -1,30 +1,68 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// POST - Vytvoření nového uživatele (Registrace)
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
+
+// POST /api/users/register - register new user
 router.post("/register", async (req, res) => {
   try {
-    // Zde později přidáme kontrolu, zda uživatel s tímto emailem už neexistuje
-    // a zahashujeme heslo. Prozatím ukládáme čistá data pro testování.
-    const newUser = new User(req.body);
-    const savedUser = await newUser.save();
+    const { firstName, lastName, email, password, role } = req.body;
 
-    // Pro bezpečnost nevracíme heslo v odpovědi
-    savedUser.password = undefined;
+    //check if user exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res
+        .status(400)
+        .json({ error: "User with this email already exists" });
+    }
 
-    res.status(201).json(savedUser);
+    // create user
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      role,
+    });
+
+    // return data and token
+    res.status(201).json({
+      _id: user._id,
+      firstName: user.firstName,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// GET - Získání všech uživatelů (např. pro trenéra)
-router.get("/", async (req, res) => {
+// POST /api/users/login - login user
+router.post("/login", async (req, res) => {
   try {
-    // Vracíme uživatele, ale vynecháme hesla (selektujeme přes '-password')
-    const users = await User.find().select("-password");
-    res.json(users);
+    const { email, password } = req.body;
+
+    // find user by email
+    const user = await User.findOne({ email });
+
+    if (user && (await user.matchPassword(password))) {
+      res.json({
+        _id: user._id,
+        firstName: user.firstName,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(401).json({ error: "Neplatný email nebo heslo" });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
