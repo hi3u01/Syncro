@@ -1,21 +1,25 @@
 const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
 require("dotenv").config();
+
+const cors = require("cors");
+const connectDB = require("./config/db");
 const userRoutes = require("./routes/users");
 const reportRoutes = require("./routes/reports");
 
 const app = express();
+
+// Connection to database
+connectDB();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/api/users", userRoutes);
+
+// Routes
+app.use("/users", userRoutes);
 app.use("/reports", reportRoutes);
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("[DATABASE] SYNCRO connected to MongoDB"))
-  .catch((err) => console.error("[DATABASE] SYNCRO connection error:", err));
-
+// Testing route
 app.get("/", (req, res) => {
   res.send("SYNCRO API is running");
 });
