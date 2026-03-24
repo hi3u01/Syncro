@@ -1,25 +1,42 @@
-function App() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        width: "100vw",
-        fontFamily: "sans-serif",
-        textAlign: "center",
-        margin: 0,
-      }}
-    >
-      <h1>SYNCRO</h1>
-      <p>Monitoring fyzické a psychické kondice hráčů</p>
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
-      <div>
-        <h3>COMING SOON...</h3>
-      </div>
-    </div>
+function App() {
+  const { user, loading } = useContext(AuthContext);
+
+  // Zatímco se načítají data z localStorage, ukážeme prázdnou stránku (nebo spinner)
+  if (loading) return <div>Načítání...</div>;
+
+  return (
+    <Router>
+      <Routes>
+        {/* Pokud není uživatel přihlášen, ukážeme Login */}
+        <Route
+          path="/login"
+          element={!user ? <Login /> : <Navigate to="/dashboard" />}
+        />
+
+        {/* Chráněná cesta - pokud není přihlášen, pošleme ho na login */}
+        <Route
+          path="/dashboard"
+          element={user ? <Dashboard /> : <Navigate to="/login" />}
+        />
+
+        {/* Jakákoliv jiná neexistující adresa přesměruje na správné místo */}
+        <Route
+          path="*"
+          element={<Navigate to={user ? "/dashboard" : "/login"} />}
+        />
+      </Routes>
+    </Router>
   );
 }
 
