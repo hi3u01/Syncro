@@ -7,36 +7,57 @@ import {
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Teams from "./pages/Teams";
+import Layout from "./components/Layout";
 
 function App() {
   const { user, loading } = useContext(AuthContext);
 
-  // Zatímco se načítají data z localStorage, ukážeme prázdnou stránku (nebo spinner)
   if (loading) return <div>Načítání...</div>;
 
   return (
     <Router>
       <Routes>
-        {/* Pokud není uživatel přihlášen, může na registraci */}
-        <Route
-          path="/register"
-          element={!user ? <Register /> : <Navigate to="/dashboard" />}
-        />
-        {/* Pokud není uživatel přihlášen, ukážeme Login */}
+        {/* Veřejné cesty (BEZ Sidebaru) */}
         <Route
           path="/login"
           element={!user ? <Login /> : <Navigate to="/dashboard" />}
         />
-
-        {/* Chráněná cesta - pokud není přihlášen, pošleme ho na login */}
         <Route
-          path="/dashboard"
-          element={user ? <Dashboard /> : <Navigate to="/login" />}
+          path="/register"
+          element={!user ? <Register /> : <Navigate to="/dashboard" />}
         />
 
-        {/* Jakákoliv jiná neexistující adresa přesměruje na správné místo */}
+        {/* Chráněné cesty (S Layoutem a Sidebarem) */}
+        <Route
+          path="/dashboard"
+          element={
+            user ? (
+              <Layout>
+                <Dashboard />
+              </Layout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+
+        <Route
+          path="/teams"
+          element={
+            user ? (
+              <Layout>
+                <Teams />
+              </Layout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+
+        {/* Přesměrování všeho ostatního */}
         <Route
           path="*"
           element={<Navigate to={user ? "/dashboard" : "/login"} />}

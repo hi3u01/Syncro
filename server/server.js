@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/users");
 const reportRoutes = require("./routes/reports");
+const teamsRoutes = require("./routes/teams");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 // Routes
 app.use("/users", userRoutes);
 app.use("/reports", reportRoutes);
+app.use("/teams", teamsRoutes);
 
 // Testing route
 app.get("/", (req, res) => {

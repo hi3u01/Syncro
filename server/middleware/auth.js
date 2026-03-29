@@ -25,4 +25,14 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+const coachOnly = (req, res, next) => {
+  if (req.user && req.user.role === "coach") {
+    next();
+  } else {
+    res.status(403).json({
+      error: "Access denied. Only the coach can perform this action.",
+    });
+  }
+};
+
+module.exports = { protect, coachOnly };

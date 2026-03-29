@@ -9,7 +9,7 @@ const generateToken = (id) => {
   });
 };
 
-// POST /api/users/register - register new user
+// POST /users/register - register new user
 router.post("/register", async (req, res) => {
   try {
     const { firstName, lastName, email, password, role } = req.body;
@@ -44,7 +44,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// POST /api/users/login - login user
+// POST /users/login - login user
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
