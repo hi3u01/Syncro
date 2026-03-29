@@ -1,9 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, Activity } from "lucide-react";
+import { LayoutDashboard, Users, Activity, LogOut } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Sidebar = () => {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
+  const { logout } = useContext(AuthContext);
 
   return (
     <aside className="w-[250px] bg-[#111827] text-white flex flex-col min-h-screen shadow-[4px_0_10px_rgba(0,0,0,0.1)]">
@@ -42,6 +45,12 @@ const Sidebar = () => {
 
       {/* Footer area */}
       <div className="p-5 text-[12px] text-[#6B7280] text-center">
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 px-4 py-2 bg-[#DC2626] hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
+        >
+          <LogOut size={16} /> Odhlásit se
+        </button>
         © 2026 SYNCRO
       </div>
     </aside>
