@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
 import { LogIn, AlertCircle } from "lucide-react";
@@ -120,6 +120,18 @@ const Login = () => {
           <LogIn size={18} />
           Přihlásit se
         </button>
+        <div style={{ marginTop: "2px", textAlign: "center" }}>
+          <Link
+            to="/register"
+            style={{
+              color: "#2563EB",
+              fontWeight: "bold",
+              textDecoration: "none",
+            }}
+          >
+            Vytvořit účet
+          </Link>
+        </div>
       </form>
     </div>
   );

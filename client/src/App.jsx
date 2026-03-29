@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Register from "./pages/Register";
 
 function App() {
   const { user, loading } = useContext(AuthContext);
@@ -18,6 +19,11 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Pokud není uživatel přihlášen, může na registraci */}
+        <Route
+          path="/register"
+          element={!user ? <Register /> : <Navigate to="/dashboard" />}
+        />
         {/* Pokud není uživatel přihlášen, ukážeme Login */}
         <Route
           path="/login"
