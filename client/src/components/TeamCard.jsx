@@ -1,4 +1,4 @@
-import { Copy } from "lucide-react";
+import { Copy, Users } from "lucide-react";
 
 const TeamCard = ({ team, players }) => {
   const copyToClipboard = () => {
@@ -9,95 +9,65 @@ const TeamCard = ({ team, players }) => {
   };
 
   return (
-    <div style={{ marginTop: "20px", marginBottom: "40px" }}>
-      <div
-        style={{
-          backgroundColor: "#EFF6FF",
-          border: "1px solid #BFDBFE",
-          padding: "20px",
-          borderRadius: "8px",
-          marginBottom: "15px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+    <div className="mt-5 mb-10 bg-[#111827] rounded-xl border border-gray-800 overflow-hidden shadow-lg">
+      {/* Horní část karty s názvem a kódem */}
+      <div className="bg-[#1e2530] p-5 flex justify-between items-center border-b border-gray-800">
         <div>
-          <h2 style={{ margin: "0 0 5px 0", color: "#1E3A8A" }}>{team.name}</h2>
+          <h2 className="text-xl font-bold text-white m-0">{team.name}</h2>
+          <p className="text-gray-400 text-sm mt-1 flex items-center gap-2">
+            <Users size={14} /> Aktivní tým
+          </p>
         </div>
 
-        <div style={{ textAlign: "right" }}>
-          <p
-            style={{
-              margin: "0 0 5px 0",
-              fontSize: "14px",
-              color: "#4B5563",
-            }}
-          >
-            Zvací kód pro hráče:
+        <div className="text-right">
+          <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">
+            Zvací kód
           </p>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span
-              style={{
-                fontSize: "24px",
-                fontWeight: "bold",
-                letterSpacing: "2px",
-                color: "#111827",
-              }}
-            >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-mono font-bold tracking-widest text-emerald-400">
               {team.joinCode}
             </span>
             <button
               onClick={copyToClipboard}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#6B7280",
-              }}
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-md transition-all"
               title="Kopírovat kód"
             >
-              <Copy size={20} />
+              <Copy size={18} />
             </button>
           </div>
         </div>
       </div>
 
-      <h3 style={{ margin: "0 0 10px 0" }}>Seznam hráčů ({players.length})</h3>
+      {/* Seznam hráčů */}
+      <div className="p-5">
+        <h3 className="text-gray-300 font-semibold mb-4 text-sm uppercase tracking-wide">
+          Hráči v týmu ({players.length})
+        </h3>
 
-      {players.length === 0 ? (
-        <p
-          style={{
-            color: "#6B7280",
-            fontStyle: "italic",
-            padding: "20px",
-            backgroundColor: "#f9fafb",
-            borderRadius: "8px",
-            margin: 0,
-          }}
-        >
-          Zatím se nepřidal žádný hráč. Pošlete jim zvací kód!
-        </p>
-      ) : (
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {players.map((player) => (
-            <li
-              key={player._id}
-              style={{
-                padding: "15px",
-                borderBottom: "1px solid #E5E7EB",
-                display: "flex",
-                justifyContent: "space-between",
-                backgroundColor: "white",
-              }}
-            >
-              <strong>
-                {player.firstName} {player.lastName}
-              </strong>
-            </li>
-          ))}
-        </ul>
-      )}
+        {players.length === 0 ? (
+          <div className="py-6 text-center bg-black/20 rounded-lg border border-dashed border-gray-700">
+            <p className="text-gray-500 italic text-sm">
+              Zatím se nepřidal žádný hráč. Pošlete jim kód!
+            </p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-gray-800">
+            {players.map((player) => (
+              <li
+                key={player._id}
+                className="py-3 flex justify-between items-center group transition-all"
+              >
+                <span className="text-gray-200 font-medium group-hover:text-emerald-400 transition-colors">
+                  {player.firstName} {player.lastName}
+                </span>
+                <span className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded">
+                  Hráč
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

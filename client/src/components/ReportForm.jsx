@@ -1,9 +1,9 @@
 import { useState } from "react";
 import API from "../services/api";
-import { Activity, Brain, Moon, Battery, Frown, Smile } from "lucide-react";
+import { Activity, Brain, Moon, Battery, Smile } from "lucide-react";
 
 const ReportForm = ({ onReportSaved }) => {
-  // Stavy pro všechny položky tvého Report.js modelu
+  // Stavy pro všechny položky modelu
   const [duration, setDuration] = useState("");
   const [rpe, setRpe] = useState(5);
   const [fatigue, setFatigue] = useState(3);
@@ -18,7 +18,6 @@ const ReportForm = ({ onReportSaved }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Odeslání na tvůj backend (API už díky interceptoru pošle i token)
       await API.post("/reports", {
         duration: Number(duration),
         rpe,
@@ -31,11 +30,9 @@ const ReportForm = ({ onReportSaved }) => {
       });
 
       setMessage("Report byl úspěšně uložen! Dobrá práce.");
-      // Volitelný reset formuláře
       setDuration("");
       setNote("");
 
-      // Pokud chceme v Dashboardu po uložení něco udělat (např. aktualizovat graf)
       if (onReportSaved) onReportSaved();
     } catch (error) {
       setMessage(
@@ -47,47 +44,44 @@ const ReportForm = ({ onReportSaved }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "20px",
-        maxWidth: "500px",
-        background: "black",
-        padding: "20px",
-        borderRadius: "8px",
-        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-      }}
+      className="flex flex-col gap-5 max-w-[500px] bg-black p-6 rounded-lg shadow-xl text-white"
     >
-      <h3>Potréninkový report</h3>
+      <h3 className="text-xl font-bold border-b border-gray-800 pb-2">
+        Potréninkový report
+      </h3>
 
       {message && (
         <div
-          style={{
-            padding: "10px",
-            background: message.includes("Chyba") ? "#fee2e2" : "#dcfce3",
-            borderRadius: "5px",
-          }}
+          className={`p-3 rounded text-sm font-medium ${
+            message.includes("Chyba")
+              ? "bg-red-900/30 text-red-400 border border-red-800"
+              : "bg-emerald-900/30 text-emerald-400 border border-emerald-800"
+          }`}
         >
           {message}
         </div>
       )}
 
-      <div>
-        <label>
-          <strong>Délka tréninku (minuty):</strong>
+      {/* Délka tréninku */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-bold text-gray-300 uppercase tracking-wide">
+          Délka tréninku (minuty):
         </label>
         <input
           type="number"
           required
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+          placeholder="Např. 90"
+          className="w-full bg-[#1e2530] border-none p-2.5 text-white rounded focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
         />
       </div>
 
-      <div>
-        <label>
-          <strong>RPE - Subjektivní zátěž (1-10): {rpe}</strong>
+      {/* RPE Slider */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-bold text-gray-300 uppercase tracking-wide flex justify-between">
+          <span>RPE - Subjektivní zátěž (1-10):</span>
+          <span className="text-emerald-400 font-mono text-lg">{rpe}</span>
         </label>
         <input
           type="range"
@@ -95,16 +89,16 @@ const ReportForm = ({ onReportSaved }) => {
           max="10"
           value={rpe}
           onChange={(e) => setRpe(Number(e.target.value))}
-          style={{ width: "100%" }}
+          className="w-full accent-emerald-500 cursor-pointer"
         />
       </div>
 
-      <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}
-      >
-        <div>
-          <label>
-            <Battery size={16} /> Únava (1-5): <strong>{fatigue}</strong>
+      {/* Grid pro 1-5 parametry */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-gray-400 flex items-center gap-2">
+            <Battery size={14} className="text-yellow-500" /> Únava:{" "}
+            <span className="text-white">{fatigue}</span>
           </label>
           <input
             type="range"
@@ -112,12 +106,13 @@ const ReportForm = ({ onReportSaved }) => {
             max="5"
             value={fatigue}
             onChange={(e) => setFatigue(Number(e.target.value))}
-            style={{ width: "100%" }}
+            className="accent-emerald-500 cursor-pointer"
           />
         </div>
-        <div>
-          <label>
-            <Moon size={16} /> Spánek (1-5): <strong>{sleep}</strong>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-gray-400 flex items-center gap-2">
+            <Moon size={14} className="text-blue-400" /> Spánek:{" "}
+            <span className="text-white">{sleep}</span>
           </label>
           <input
             type="range"
@@ -125,13 +120,13 @@ const ReportForm = ({ onReportSaved }) => {
             max="5"
             value={sleep}
             onChange={(e) => setSleep(Number(e.target.value))}
-            style={{ width: "100%" }}
+            className="accent-emerald-500 cursor-pointer"
           />
         </div>
-        <div>
-          <label>
-            <Activity size={16} /> Bolest svalů (1-5):{" "}
-            <strong>{soreness}</strong>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-gray-400 flex items-center gap-2">
+            <Activity size={14} className="text-red-400" /> Svaly:{" "}
+            <span className="text-white">{soreness}</span>
           </label>
           <input
             type="range"
@@ -139,12 +134,13 @@ const ReportForm = ({ onReportSaved }) => {
             max="5"
             value={soreness}
             onChange={(e) => setSoreness(Number(e.target.value))}
-            style={{ width: "100%" }}
+            className="accent-emerald-500 cursor-pointer"
           />
         </div>
-        <div>
-          <label>
-            <Brain size={16} /> Stres (1-5): <strong>{stress}</strong>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-gray-400 flex items-center gap-2">
+            <Brain size={14} className="text-purple-400" /> Stres:{" "}
+            <span className="text-white">{stress}</span>
           </label>
           <input
             type="range"
@@ -152,12 +148,13 @@ const ReportForm = ({ onReportSaved }) => {
             max="5"
             value={stress}
             onChange={(e) => setStress(Number(e.target.value))}
-            style={{ width: "100%" }}
+            className="accent-emerald-500 cursor-pointer"
           />
         </div>
-        <div style={{ gridColumn: "span 2" }}>
-          <label>
-            <Smile size={16} /> Nálada (1-5): <strong>{mood}</strong>
+        <div className="col-span-2 flex flex-col gap-1.5 pt-2">
+          <label className="text-xs font-bold text-gray-400 flex items-center gap-2">
+            <Smile size={14} className="text-emerald-400" /> Nálada:{" "}
+            <span className="text-white">{mood}</span>
           </label>
           <input
             type="range"
@@ -165,39 +162,28 @@ const ReportForm = ({ onReportSaved }) => {
             max="5"
             value={mood}
             onChange={(e) => setMood(Number(e.target.value))}
-            style={{ width: "100%" }}
+            className="accent-emerald-500 cursor-pointer"
           />
         </div>
       </div>
 
-      <div>
-        <label>
-          <strong>Poznámka pro trenéra (volitelné):</strong>
+      {/* Poznámka */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-bold text-gray-300 uppercase tracking-wide">
+          Poznámka pro trenéra:
         </label>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           maxLength="500"
-          style={{
-            width: "100%",
-            padding: "8px",
-            marginTop: "5px",
-            minHeight: "80px",
-          }}
+          placeholder="Dnes se mi běželo dobře, ale ke konci mě tahalo lýtko..."
+          className="w-full bg-[#1e2530] border-none p-2.5 text-white rounded min-h-[80px] focus:ring-1 focus:ring-emerald-500 outline-none transition-all resize-none"
         />
       </div>
 
       <button
         type="submit"
-        style={{
-          padding: "12px",
-          background: "#2563eb",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
+        className="py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded shadow-lg shadow-emerald-900/20 transition-all active:scale-[0.98]"
       >
         Odeslat report
       </button>

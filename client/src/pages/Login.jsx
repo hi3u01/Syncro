@@ -14,125 +14,75 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Vyčištění předchozích chyb před novým pokusem
+    setError("");
 
     try {
-      // Odeslání dat na náš backend (API z api.js automaticky přidává /api)
       const response = await API.post("/users/login", { email, password });
-
-      // Úspěch! Uložíme uživatele do kontextu a do prohlížeče
       login(response.data);
-
-      // Přesměrujeme ho do aplikace
       navigate("/dashboard");
     } catch (err) {
-      // Pokud backend vrátí chybu (např. 401 Neplatné heslo), zobrazíme ji
       setError(err.response?.data?.error || "Při přihlašování došlo k chybě.");
     }
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "400px",
-        margin: "100px auto",
-        fontFamily: "sans-serif",
-      }}
-    >
-      <h2>Přihlášení do SYNCRO</h2>
+    <div className="min-h-screen bg-black flex flex-col items-center pt-32 font-sans text-white">
+      <div className="w-full max-w-[400px] px-6">
+        <h2 className="text-xl mb-6 text-gray-200">Přihlášení do SYNCRO</h2>
 
-      {error && (
-        <div
-          style={{
-            color: "#D8000C",
-            backgroundColor: "#FFBABA",
-            padding: "10px",
-            borderRadius: "5px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "15px",
-          }}
-        >
-          <AlertCircle size={18} />
-          <span>{error}</span>
-        </div>
-      )}
+        {error && (
+          <div className="text-red-400 bg-red-900/30 border border-red-800 p-3 rounded-md flex items-center gap-3 mb-5">
+            <AlertCircle size={18} />
+            <span className="text-sm">{error}</span>
+          </div>
+        )}
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "15px" }}
-      >
-        <div>
-          <label
-            style={{
-              display: "block",
-              marginBottom: "5px",
-              fontWeight: "bold",
-            }}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {/* E-mail */}
+          <div className="flex flex-col gap-2">
+            <label className="font-bold text-gray-200">E-mail:</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="vás@email.cz"
+              className="w-full bg-[#1e2530] border-none p-3 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+            />
+          </div>
+
+          {/* Heslo */}
+          <div className="flex flex-col gap-2">
+            <label className="font-bold text-gray-200">Heslo:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+              className="w-full bg-[#1e2530] border-none p-3 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold flex justify-center items-center gap-2 transition-colors active:scale-[0.98]"
           >
-            E-mail:
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
-          />
-        </div>
+            <LogIn size={18} />
+            Přihlásit se
+          </button>
+        </form>
 
-        <div>
-          <label
-            style={{
-              display: "block",
-              marginBottom: "5px",
-              fontWeight: "bold",
-            }}
-          >
-            Heslo:
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
-          />
-        </div>
-
-        <button
-          type="submit"
-          style={{
-            padding: "12px",
-            backgroundColor: "#2563EB",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "8px",
-            fontSize: "16px",
-          }}
-        >
-          <LogIn size={18} />
-          Přihlásit se
-        </button>
-        <div style={{ marginTop: "2px", textAlign: "center" }}>
+        <div className="mt-8 text-center flex flex-col gap-2">
+          <p className="text-gray-500 text-sm">Ještě nemáš účet?</p>
           <Link
             to="/register"
-            style={{
-              color: "#2563EB",
-              fontWeight: "bold",
-              textDecoration: "none",
-            }}
+            className="text-blue-500 font-bold hover:text-blue-400 transition-colors"
           >
             Vytvořit účet
           </Link>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

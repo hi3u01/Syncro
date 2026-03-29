@@ -2,63 +2,26 @@ import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Users, Activity } from "lucide-react";
 
 const Sidebar = () => {
-  // Get current URL path to highlight the active menu item
   const location = useLocation();
-
-  // Helper function to determine if a link is active
   const isActive = (path) => location.pathname === path;
 
-  // Base styling for links
-  const linkStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "12px 16px",
-    textDecoration: "none",
-    borderRadius: "8px",
-    marginBottom: "8px",
-    fontWeight: "500",
-    transition: "all 0.2s ease",
-  };
-
   return (
-    <aside
-      style={{
-        width: "250px",
-        backgroundColor: "#111827", // Dark theme for sidebar
-        color: "white",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh", // Full height
-        boxShadow: "4px 0 10px rgba(0,0,0,0.1)",
-      }}
-    >
+    <aside className="w-[250px] bg-[#111827] text-white flex flex-col min-h-screen shadow-[4px_0_10px_rgba(0,0,0,0.1)]">
       {/* App Logo / Header */}
-      <div
-        style={{
-          padding: "24px",
-          borderBottom: "1px solid #374151",
-          marginBottom: "20px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
+      <div className="p-6 border-b border-[#374151] mb-5 flex items-center gap-[10px]">
         <Activity color="#3B82F6" size={28} />
-        <h2 style={{ margin: 0, fontSize: "24px", letterSpacing: "1px" }}>
-          SYNCRO
-        </h2>
+        <h2 className="m-0 text-[24px] tracking-[1px]">SYNCRO</h2>
       </div>
 
       {/* Navigation Links */}
-      <nav style={{ padding: "0 16px", flex: 1 }}>
+      <nav className="px-4 flex-1">
         <Link
           to="/dashboard"
-          style={{
-            ...linkStyle,
-            backgroundColor: isActive("/dashboard") ? "#1F2937" : "transparent",
-            color: isActive("/dashboard") ? "#60A5FA" : "#D1D5DB",
-          }}
+          className={`flex items-center gap-3 px-4 py-3 no-underline rounded-lg mb-2 font-medium transition-all duration-200 ${
+            isActive("/dashboard")
+              ? "bg-[#1F2937] text-[#60A5FA]"
+              : "bg-transparent text-[#D1D5DB]"
+          }`}
         >
           <LayoutDashboard size={20} />
           Dashboard
@@ -66,26 +29,19 @@ const Sidebar = () => {
 
         <Link
           to="/teams"
-          style={{
-            ...linkStyle,
-            backgroundColor: isActive("/teams") ? "#1F2937" : "transparent",
-            color: isActive("/teams") ? "#60A5FA" : "#D1D5DB",
-          }}
+          className={`flex items-center gap-3 px-4 py-3 no-underline rounded-lg mb-2 font-medium transition-all duration-200 ${
+            isActive("/teams")
+              ? "bg-[#1F2937] text-[#60A5FA]"
+              : "bg-transparent text-[#D1D5DB]"
+          }`}
         >
           <Users size={20} />
           Týmy
         </Link>
       </nav>
 
-      {/* Footer area of sidebar (optional) */}
-      <div
-        style={{
-          padding: "20px",
-          fontSize: "12px",
-          color: "#6B7280",
-          textAlign: "center",
-        }}
-      >
+      {/* Footer area */}
+      <div className="p-5 text-[12px] text-[#6B7280] text-center">
         © 2026 SYNCRO
       </div>
     </aside>
