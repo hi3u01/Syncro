@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const Team = require("../models/Team");
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -12,14 +13,25 @@ const generateToken = (id) => {
 // POST /users/register - register new user
 router.post("/register", async (req, res) => {
   try {
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, email, password, role, joinCode } = req.body;
 
-    //check if user exists
+    // check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res
         .status(400)
-        .json({ error: "User with this email already exists" });
+        .json({ error: "Uživatel s tímto e-mailem již existuje." });
+    }
+
+    let assignedTeamId = null;
+
+    // if player and provided a join code
+    if (role === "player" && joinCode) {
+      const team = await Team.findOne({ joinCode });
+      if (!team) {
+        return res.status(400).json({ error: "Invalid team invite code." });
+      }
+      assignedTeamId = team._id;
     }
 
     // create user
@@ -29,6 +41,7 @@ router.post("/register", async (req, res) => {
       email,
       password,
       role,
+      teamId: assignedTeamId,
     });
 
     // return data and token
@@ -37,6 +50,7 @@ router.post("/register", async (req, res) => {
       firstName: user.firstName,
       email: user.email,
       role: user.role,
+      teamId: user.teamId,
       token: generateToken(user._id),
     });
   } catch (err) {
@@ -58,10 +72,11 @@ router.post("/login", async (req, res) => {
         firstName: user.firstName,
         email: user.email,
         role: user.role,
+        teamId: user.teamId,
         token: generateToken(user._id),
       });
     } else {
-      res.status(401).json({ error: "Neplatný email nebo heslo" });
+      res.status(401).json({ error: "Neplatný email nebo heslo." });
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
