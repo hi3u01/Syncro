@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
 import { LogIn, AlertCircle } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -26,61 +28,84 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center pt-32 font-sans text-white">
-      <div className="w-full max-w-[400px] px-6">
-        <h2 className="text-xl mb-6 text-gray-200">Přihlášení do SYNCRO</h2>
+    <div className="flex min-h-screen w-full font-sans bg-[#1a1a1a]">
+      <div className="hidden lg:flex lg:w-1/2 bg-white items-center justify-center p-12">
+        <div className="text-center">
+          <h1 className="text-5xl font-black text-black tracking-tighter italic">
+            SYNCRO.
+          </h1>
+          <p className="text-gray-400 mt-4 font-medium uppercase tracking-widest text-xs">
+            Performance Tracking System
+          </p>
+        </div>
+      </div>
 
-        {error && (
-          <div className="text-red-400 bg-red-900/30 border border-red-800 p-3 rounded-md flex items-center gap-3 mb-5">
-            <AlertCircle size={18} />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          {/* E-mail */}
-          <div className="flex flex-col gap-2">
-            <label className="font-bold text-gray-200">E-mail:</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="vás@email.cz"
-              className="w-full bg-[#1e2530] border-none p-3 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
-            />
+      <div className="w-full lg:w-1/2 bg-[#1a1a1a] flex items-center justify-center p-8 md:p-16">
+        <div className="w-full max-w-[420px] flex flex-col">
+          <div className="text-center mb-2">
+            <h2 className="text-3xl font-extrabold text-white tracking-tight !py-2">
+              PŘIHLAŠTE SE
+            </h2>
           </div>
 
-          {/* Heslo */}
-          <div className="flex flex-col gap-2">
-            <label className="font-bold text-gray-200">Heslo:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-              className="w-full bg-[#1e2530] border-none p-3 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
-            />
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/20 p-3 rounded-xl flex items-center gap-3 text-destructive animate-in fade-in zoom-in-95">
+              <AlertCircle size={18} />
+              <span className="text-sm font-semibold">{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+            <div className="space-y-2">
+              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+                E-mail
+              </label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder=""
+                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+                Heslo
+              </label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder=""
+                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full bg-[#5b5e36] hover:bg-[#4b4e26] h-12 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 mt-4 flex items-center justify-center gap-2"
+            >
+              <LogIn size={20} />
+              PŘIHLÁSIT SE
+            </Button>
+          </form>
+
+          <div className="flex justify-between items-center px-4 !mt-3">
+            <Link
+              to="/forgot-password"
+              className="text-[12px] font-bold !text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
+            >
+              Zapomněli heslo?
+            </Link>
+            <Link
+              to="/register"
+              className="text-[12px] font-bold !text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
+            >
+              Vytvořit účet
+            </Link>
           </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold flex justify-center items-center gap-2 transition-colors active:scale-[0.98]"
-          >
-            <LogIn size={18} />
-            Přihlásit se
-          </button>
-        </form>
-
-        <div className="mt-8 text-center flex flex-col gap-2">
-          <p className="text-gray-500 text-sm">Ještě nemáš účet?</p>
-          <Link
-            to="/register"
-            className="text-blue-500 font-bold hover:text-blue-400 transition-colors"
-          >
-            Vytvořit účet
-          </Link>
         </div>
       </div>
     </div>
