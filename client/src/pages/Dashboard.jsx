@@ -7,15 +7,10 @@ const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
 
   return (
-    // Celou stránku nastavíme jako flexbox, který centruje svůj obsah doprostřed
     <div className="w-full text-white font-sans flex justify-center pt-8 pb-20">
-      {/* TOTO JE TVŮJ STŘEDOVÝ SLOUPEC (jako chat okno) */}
-      {/* Nastavíme mu šířku 95% na mobilech a max 800px na počítači */}
       <div className="w-[95%] max-w-[800px] flex flex-col">
-        {/* Hlavička s pozdravem a tlačítkem */}
         <div className="flex justify-between items-start mb-10 w-full border-b border-gray-800 pb-6">
           <div className="flex items-center gap-4">
-            {/* Přidána ikonka uživatele pro profi vzhled */}
             <UserCircle size={50} className="text-gray-600" />
             <div>
               <h1 className="text-2xl font-bold m-0 p-0 leading-tight">

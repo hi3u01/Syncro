@@ -35,7 +35,7 @@ const Login = () => {
             SYNCRO.
           </h1>
           <p className="text-gray-400 mt-4 font-medium uppercase tracking-widest text-xs">
-            Performance Tracking System
+            Performance tracking system for athletes
           </p>
         </div>
       </div>
