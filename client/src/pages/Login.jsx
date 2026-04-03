@@ -85,7 +85,7 @@ const Login = () => {
             </div>
             <Button
               type="submit"
-              className="w-full bg-[#5b5e36] hover:bg-[#4b4e26] h-12 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 mt-4 flex items-center justify-center gap-2"
+              className="w-full bg-[#4E4619] hover:bg-[#4b4e26] h-12 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 mt-4 flex items-center justify-center gap-2"
             >
               <LogIn size={20} />
               PŘIHLÁSIT SE

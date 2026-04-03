@@ -63,7 +63,7 @@ const ReportForm = ({ onReportSaved }) => {
   };
 
   return (
-    <div className="w-[95%] md:w-3/4 max-w-[1200px]  mx-auto overflow-hidden shadow-2xl text-white font-sans">
+    <div className="w-full text-white font-sans">
       <form
         onSubmit={handleSubmit}
         className="p-8 md:p-12 flex flex-col gap-8 "
@@ -217,7 +217,7 @@ const ReportForm = ({ onReportSaved }) => {
 
             <div className="space-y-2">
               <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
-                5. Jaká byla tvoje nálada během dne?
+                5. Jaká byla tvoje nálada během dneška?
               </label>
               <div className="relative">
                 <Select
@@ -248,7 +248,7 @@ const ReportForm = ({ onReportSaved }) => {
 
             <div className="space-y-2">
               <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
-                Chtěl/a bych něco vzkázat trenérovi
+                Chtěl/a bych něco vzkázat trenérovi?
               </label>
               <input
                 type="text"
@@ -262,7 +262,7 @@ const ReportForm = ({ onReportSaved }) => {
 
         <Button
           type="submit"
-          className="w-full bg-[#5b5e36] hover:bg-[#4b4e26] h-12 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 mt-4 flex items-center justify-center gap-2"
+          className="w-full bg-[#4E4619] hover:bg-[#4b4e26] h-12 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 mt-4 flex items-center justify-center gap-2"
         >
           ODESLAT
         </Button>
