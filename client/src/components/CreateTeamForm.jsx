@@ -57,7 +57,7 @@ const CreateTeamForm = ({ onSuccess, onCancel }) => {
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
             required
-            placeholder="Např. Sparta U19"
+            placeholder="Např. Barcelona U19"
             className="bg-[#2a303c] text-white h-10 rounded-xl px-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-gray-500 text-[15px]"
           />
         </div>

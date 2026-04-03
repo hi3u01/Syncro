@@ -69,14 +69,12 @@ const Teams = () => {
           Správa Týmů
         </h1>
 
-        {!showForm && (
-          <Button
-            onClick={() => setShowForm(true)}
-            className="bg-[#4E4619] hover:bg-[#4b4e26] text-white rounded-xl font-bold uppercase tracking-widest text-[11px] flex items-center gap-2 h-10 px-5 transition-all shadow-lg active:scale-95"
-          >
-            <Plus size={16} /> Nový tým
-          </Button>
-        )}
+        <Button
+          onClick={() => setShowForm(true)}
+          className="bg-[#4E4619] hover:bg-[#4b4e26] text-white rounded-xl font-bold uppercase tracking-widest text-[11px] flex items-center gap-2 h-10 px-5 transition-all shadow-lg active:scale-95"
+        >
+          <Plus size={16} /> Nový tým
+        </Button>
       </div>
 
       {error && (
@@ -87,18 +85,26 @@ const Teams = () => {
       )}
 
       {showForm && (
-        <div className="mb-8">
-          <CreateTeamForm
-            onSuccess={(newTeam) => {
-              setTeams((prevTeams) => [...prevTeams, newTeam]);
-              setShowForm(false);
-            }}
-            onCancel={() => setShowForm(false)}
-          />
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={() => setShowForm(false)} // Kliknutí mimo formulář ho zavře
+        >
+          <div
+            className="w-full max-w-[450px]"
+            onClick={(e) => e.stopPropagation()} // Zabrání zavření při klikání přímo do formuláře
+          >
+            <CreateTeamForm
+              onSuccess={(newTeam) => {
+                setTeams((prevTeams) => [...prevTeams, newTeam]);
+                setShowForm(false);
+              }}
+              onCancel={() => setShowForm(false)}
+            />
+          </div>
         </div>
       )}
 
-      {teams.length === 0 && !showForm && (
+      {teams.length === 0 && (
         <div className="text-center py-20 px-5 bg-[#1a1a1a]/40 border-2 border-dashed border-[#2a303c] rounded-3xl flex flex-col items-center">
           <div className="bg-[#2a303c]/50 p-4 rounded-2xl mb-5">
             <Users size={40} className="text-gray-500" />
