@@ -66,7 +66,7 @@ const Register = () => {
       <div className="w-full lg:w-1/2 bg-[#1a1a1a] flex items-center justify-center p-8 md:p-16">
         <div className="w-full max-w-[420px] flex flex-col">
           <div className="text-center mb-2">
-            <h2 className="text-3xl font-extrabold text-white tracking-tight !py-2">
+            <h2 className="text-3xl font-extrabold text-white tracking-tight py-2">
               REGISTRACE
             </h2>
           </div>
@@ -80,7 +80,7 @@ const Register = () => {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-7">
             <div className="space-y-2">
-              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+              <label className="block text-[12px] font-bold text-gray-400 px-2 uppercase tracking-widest">
                 Jméno:
               </label>
               <Input
@@ -88,12 +88,12 @@ const Register = () => {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
-                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                className="bg-[#2a303c] text-white h-10 rounded-lg pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+              <label className="block text-[12px] font-bold text-gray-400 px-2 uppercase tracking-widest">
                 Přijmení:
               </label>
               <Input
@@ -101,12 +101,12 @@ const Register = () => {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
-                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                className="bg-[#2a303c] text-white h-10 rounded-lg pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+              <label className="block text-[12px] font-bold text-gray-400 px-2 uppercase tracking-widest">
                 Email:
               </label>
               <Input
@@ -114,12 +114,12 @@ const Register = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                className="bg-[#2a303c] text-white h-10 rounded-lg pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+              <label className="block text-[12px] font-bold text-gray-400 px-2 uppercase tracking-widest">
                 Heslo:
               </label>
               <Input
@@ -127,12 +127,12 @@ const Register = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                className="bg-[#2a303c] text-white h-10 rounded-lg pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+              <label className="block text-[12px] font-bold text-gray-400 px-2 uppercase tracking-widest">
                 Jsem:
               </label>
               <Select
@@ -144,7 +144,7 @@ const Register = () => {
                   }
                 }}
               >
-                <SelectTrigger className="bg-[#2a303c] w-full text-white !h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium text-[15px]">
+                <SelectTrigger className="bg-[#2a303c] w-full text-white h-10 rounded-lg pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium text-[15px]">
                   <SelectValue placeholder="Vyberte roli" />
                 </SelectTrigger>
 
@@ -171,10 +171,10 @@ const Register = () => {
 
             {role === "player" && (
               <div className="space-y-2">
-                <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+                <label className="block text-[12px] font-bold text-gray-400 px-2 uppercase tracking-widest">
                   Zvací kód týmu:
                 </label>
-                <p className="!px-2 text-xs italic text-gray-400 mb-1">
+                <p className="px-2 text-xs italic text-gray-400 mb-1">
                   Zadej kód, který ti poslal trenér, aby ses připojil/a do týmu.
                 </p>
                 <input
@@ -182,7 +182,7 @@ const Register = () => {
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   required
-                  className="bg-[#2a303c] w-full text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                  className="bg-[#2a303c] w-full text-white h-10 rounded-lg pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
                 />
               </div>
             )}
@@ -196,10 +196,10 @@ const Register = () => {
             </Button>
           </form>
 
-          <div className="!mt-3 text-center flex flex-col gap-2">
+          <div className="mt-3 text-center flex flex-col gap-2">
             <Link
               to="/login"
-              className="text-[12px] font-bold !text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
+              className="text-[12px] font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
             >
               Přihlásit se
             </Link>

@@ -43,7 +43,7 @@ const Login = () => {
       <div className="w-full lg:w-1/2 bg-[#1a1a1a] flex items-center justify-center p-8 md:p-16">
         <div className="w-full max-w-[420px] flex flex-col">
           <div className="text-center mb-2">
-            <h2 className="text-3xl font-extrabold text-white tracking-tight !py-2">
+            <h2 className="text-3xl font-extrabold text-white tracking-tight py-2">
               PŘIHLAŠTE SE
             </h2>
           </div>
@@ -57,7 +57,7 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-7">
             <div className="space-y-2">
-              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+              <label className="block text-[12px] font-bold text-gray-400 px-2 uppercase tracking-widest">
                 E-mail
               </label>
               <Input
@@ -66,12 +66,12 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder=""
-                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                className="bg-[#2a303c] text-white h-10 rounded-lg pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
+              <label className="block text-[12px] font-bold text-gray-400 px-2 uppercase tracking-widest">
                 Heslo
               </label>
               <Input
@@ -80,7 +80,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder=""
-                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                className="bg-[#2a303c] text-white h-10 rounded-lg pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
               />
             </div>
             <Button
@@ -92,7 +92,7 @@ const Login = () => {
             </Button>
           </form>
 
-          <div className="flex justify-between items-center px-4 !mt-3">
+          <div className="flex justify-between items-center px-4 mt-3">
             <Link
               to="/forgot-password"
               className="text-[12px] font-bold !text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
@@ -101,7 +101,7 @@ const Login = () => {
             </Link>
             <Link
               to="/register"
-              className="text-[12px] font-bold !text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
+              className="text-[12px] font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
             >
               Vytvořit účet
             </Link>

@@ -44,27 +44,27 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* Resetování okrajů, aby aplikace seděla přesně k hraně monitoru */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
   min-width: 320px;
   min-height: 100vh;
-  background-color: #020202; /* Lehce šedé pozadí pro celou aplikaci */
+  background-color: #020202;
 }
-
-a {
-  font-weight: 500;
-  color: #2563eb;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  a {
+    @apply font-medium text-blue-600 no-underline;
+  }
+  a:hover {
+    @apply underline;
+  }
 }
 
 @theme inline {
