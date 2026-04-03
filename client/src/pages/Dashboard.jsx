@@ -6,7 +6,7 @@ import ReportForm from "../components/ReportForm";
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
   return (
-    <div className="w-full text-white font-sans flex justify-center pt-8 pb-20">
+    <div className="w-full text-white font-sans flex justify-center pt-8 pb-20 animate-in fade-in duration-500">
       <div className="w-[95%] max-w-[800px] flex flex-col">
         <div className="flex items-center gap-4 mb-10 w-full border-b border-gray-800 pb-6">
           <UserCircle size={50} className="text-gray-600" />

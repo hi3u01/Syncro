@@ -9,13 +9,12 @@ const Sidebar = () => {
   const { logout } = useContext(AuthContext);
 
   return (
-    <aside className="w-[250px] bg-[#1a1a1a] text-white flex flex-col min-h-screen border-r border-[#2a303c]">
+    <aside className="w-[250px] bg-[#1a1a1a] text-white flex flex-col h-screen sticky top-0 border-r border-[#2a303c]">
       <div className="p-4 border-b border-[#2a303c] flex justify-center gap-3">
         <h2 className="m-0 text-3xl font-black tracking-tighter italic text-white">
           SYNCRO
         </h2>
       </div>
-
       <nav className=" flex-1 flex flex-col ">
         <Link
           to="/dashboard"
@@ -39,7 +38,6 @@ const Sidebar = () => {
           Týmy
         </Link>
       </nav>
-
       {/* Footer area */}
       <div className="p-5 text-center">
         <button

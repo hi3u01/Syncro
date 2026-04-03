@@ -4,6 +4,7 @@ import API from "../services/api";
 import { Users, AlertCircle, Plus } from "lucide-react";
 import CreateTeamForm from "../components/CreateTeamForm";
 import TeamCard from "../components/TeamCard";
+import { Button } from "../components/ui/button";
 
 const Teams = () => {
   const { user } = useContext(AuthContext);
@@ -43,48 +44,48 @@ const Teams = () => {
 
   if (loading)
     return (
-      <div className="p-5 text-center text-gray-600 animate-pulse">
+      <div className="p-10 text-center text-gray-500 font-bold uppercase tracking-widest animate-pulse">
         Načítání...
       </div>
     );
 
   if (user?.role !== "coach") {
     return (
-      <div className="p-5 font-sans">
-        <p className="text-gray-700 bg-gray-100 p-4 rounded-lg border border-gray-200">
+      <div className="p-8 font-sans max-w-6xl mx-auto">
+        <div className="text-gray-400 bg-[#1a1a1a] p-6 rounded-2xl border border-[#2a303c] text-sm font-medium">
           Jsi zaregistrován jako hráč. Správu týmu provádí tvůj trenér.
-        </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-5 font-sans max-w-6xl mx-auto">
-      {/* Header část */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="flex items-center gap-2.5 text-2xl font-bold text-gray-800 m-0">
-          <Users className="text-blue-600" /> Správa Týmů
+    <div className="p-8 font-sans max-w-6xl mx-auto animate-in fade-in duration-500">
+      <div className="flex justify-between items-center mb-8 border-b border-[#2a303c] pb-6">
+        <h1 className="flex items-center gap-3 text-3xl font-extrabold text-white m-0 tracking-tight">
+          <div className="p-2 bg-[#2a303c]/50 rounded-xl">
+            <Users className="text-gray-300" size={24} />
+          </div>
+          Správa Týmů
         </h1>
 
         {!showForm && (
-          <button
+          <Button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md transition-colors shadow-sm"
+            className="bg-[#4E4619] hover:bg-[#4b4e26] text-white rounded-xl font-bold uppercase tracking-widest text-[11px] flex items-center gap-2 h-10 px-5 transition-all shadow-lg active:scale-95"
           >
-            <Plus size={18} /> Nový tým
-          </button>
+            <Plus size={16} /> Nový tým
+          </Button>
         )}
       </div>
 
-      {/* Chybová hláška */}
       {error && (
-        <div className="flex items-center gap-2.5 p-3 mb-5 bg-red-100 border border-red-200 text-red-700 rounded-md">
+        <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-xl flex items-center gap-3 text-destructive mb-6">
           <AlertCircle size={18} />
-          <span>{error}</span>
+          <span className="text-sm font-semibold">{error}</span>
         </div>
       )}
 
-      {/* Formulář pro vytvoření týmu */}
       {showForm && (
         <div className="mb-8">
           <CreateTeamForm
@@ -97,23 +98,29 @@ const Teams = () => {
         </div>
       )}
 
-      {/* Empty State (když nejsou týmy) */}
       {teams.length === 0 && !showForm && (
-        <div className="text-center py-12 px-5 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl text-gray-500">
-          <Users size={48} className="mx-auto mb-3 opacity-30" />
-          <h3 className="text-lg font-semibold text-gray-700">
+        <div className="text-center py-20 px-5 bg-[#1a1a1a]/40 border-2 border-dashed border-[#2a303c] rounded-3xl flex flex-col items-center">
+          <div className="bg-[#2a303c]/50 p-4 rounded-2xl mb-5">
+            <Users size={40} className="text-gray-500" />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2 tracking-tight">
             Zatím nemáte žádný tým
           </h3>
-          <p className="max-w-xs mx-auto mt-2">
-            Vytvořte svůj první tým, abyste mohli pozvat hráče a sledovat jejich
-            výsledky.
+          <p className="max-w-sm mx-auto text-sm text-gray-400 font-medium leading-relaxed">
+            Vytvořte svůj první tým, abyste mohli pozvat hráče přes zvací kód a
+            začít sledovat jejich výsledky.
           </p>
+          <Button
+            onClick={() => setShowForm(true)}
+            className="mt-6 bg-[#2a303c] hover:bg-[#323946] text-white rounded-xl font-bold uppercase tracking-widest text-[11px] h-10 px-6 transition-all"
+          >
+            <Plus size={16} className="mr-2" /> Vytvořit první tým
+          </Button>
         </div>
       )}
 
-      {/* Seznam týmů */}
       {teams.length > 0 && (
-        <div className="grid gap-4">
+        <div className="grid gap-6">
           {teams.map((team) => {
             const teamPlayers = players.filter((p) => p.teamId === team._id);
             return (
