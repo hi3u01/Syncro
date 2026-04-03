@@ -9,58 +9,58 @@ const TeamCard = ({ team, players }) => {
   };
 
   return (
-    <div className="mt-5 mb-10 bg-[#111827] rounded-xl border border-gray-800 overflow-hidden shadow-lg">
-      {/* Horní část karty s názvem a kódem */}
-      <div className="bg-[#1e2530] p-5 flex justify-between items-center border-b border-gray-800">
+    <div className="mt-5 mb-10 bg-[#1a1a1a] rounded-2xl border border-[#2a303c] overflow-hidden shadow-lg">
+      <div className="bg-[#2a303c]/30 p-6 flex justify-between items-center border-b border-[#2a303c]">
         <div>
-          <h2 className="text-xl font-bold text-white m-0">{team.name}</h2>
-          <p className="text-gray-400 text-sm mt-1 flex items-center gap-2">
+          <h2 className="text-2xl font-extrabold text-white m-0 tracking-tight">
+            {team.name}
+          </h2>
+          <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mt-2 flex items-center gap-2">
             <Users size={14} /> Aktivní tým
           </p>
         </div>
 
         <div className="text-right">
-          <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">
             Zvací kód
           </p>
-          <div className="flex items-center gap-3">
-            <span className="text-2xl font-mono font-bold tracking-widest text-emerald-400">
+          <div className="flex items-center gap-2 bg-[#1a1a1a] pl-4 pr-2 py-1.5 rounded-xl border border-[#2a303c]">
+            <span className="text-xl font-mono font-bold tracking-widest text-white ">
               {team.joinCode}
             </span>
             <button
               onClick={copyToClipboard}
-              className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-md transition-all"
+              className="p-2 text-gray-400 hover:text-white hover:bg-[#2a303c] rounded-lg transition-all"
               title="Kopírovat kód"
             >
-              <Copy size={18} />
+              <Copy size={16} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Seznam hráčů */}
-      <div className="p-5">
-        <h3 className="text-gray-300 font-semibold mb-4 text-sm uppercase tracking-wide">
+      <div className="p-6">
+        <h3 className="text-gray-400 font-bold mb-4 text-[12px] uppercase tracking-widest">
           Hráči v týmu ({players.length})
         </h3>
 
         {players.length === 0 ? (
-          <div className="py-6 text-center bg-black/20 rounded-lg border border-dashed border-gray-700">
-            <p className="text-gray-500 italic text-sm">
+          <div className="py-8 text-center bg-[#2a303c]/20 rounded-xl border border-dashed border-[#2a303c]">
+            <p className="text-gray-500 font-medium text-sm">
               Zatím se nepřidal žádný hráč. Pošlete jim kód!
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-gray-800">
+          <ul className="divide-y divide-[#2a303c]">
             {players.map((player) => (
               <li
                 key={player._id}
-                className="py-3 flex justify-between items-center group transition-all"
+                className="py-4 flex justify-between items-center group transition-all"
               >
-                <span className="text-gray-200 font-medium group-hover:text-emerald-400 transition-colors">
+                <span className="text-gray-200 font-bold group-hover:text-white transition-colors">
                   {player.firstName} {player.lastName}
                 </span>
-                <span className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded">
+                <span className="text-[10px] font-bold uppercase tracking-widest bg-[#2a303c] text-gray-400 px-3 py-1 rounded-full">
                   Hráč
                 </span>
               </li>
