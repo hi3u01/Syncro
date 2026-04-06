@@ -1,8 +1,8 @@
 import { useState } from "react";
-import API from "../services/api";
+import API from "../../services/api";
 import { PlusCircle, AlertCircle, X } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 const CreateTeamForm = ({ onSuccess, onCancel }) => {
   const [teamName, setTeamName] = useState("");

@@ -2,8 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import API from "../services/api";
 import { Users, AlertCircle, Plus } from "lucide-react";
-import CreateTeamForm from "../components/CreateTeamForm";
-import TeamCard from "../components/TeamCard";
+import CreateTeamForm from "../components/teams/CreateTeamForm";
+import TeamCard from "../components/teams/TeamCard";
 import { Button } from "../components/ui/button";
 
 const Teams = () => {
@@ -87,11 +87,11 @@ const Teams = () => {
       {showForm && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-          onClick={() => setShowForm(false)} // Kliknutí mimo formulář ho zavře
+          onClick={() => setShowForm(false)}
         >
           <div
             className="w-full max-w-[450px]"
-            onClick={(e) => e.stopPropagation()} // Zabrání zavření při klikání přímo do formuláře
+            onClick={(e) => e.stopPropagation()}
           >
             <CreateTeamForm
               onSuccess={(newTeam) => {

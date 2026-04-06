@@ -1,14 +1,14 @@
 import { useState } from "react";
-import API from "../services/api";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
+import API from "../../services/api";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/select";
+} from "../ui/select";
 
 const ReportForm = ({ onReportSaved }) => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -23,11 +23,11 @@ const ReportForm = ({ onReportSaved }) => {
   const [message, setMessage] = useState("");
 
   const stressOptions = [
-    { value: "1", label: "😫 1 - Pod psa" },
-    { value: "2", label: "🙁 2 - Nic moc" },
-    { value: "3", label: "😐 3 - Normálka" },
-    { value: "4", label: "🙂 4 - Dobrý" },
-    { value: "5", label: "🤩 5 - Skvělá" },
+    { value: "1", label: "1 - Velmi špatná" },
+    { value: "2", label: "2 - Špatná" },
+    { value: "3", label: "3 - Průměrná" },
+    { value: "4", label: "4 - Dobrá" },
+    { value: "5", label: "5 - Výborná" },
   ];
 
   const handleSubmit = async (e) => {

@@ -38,7 +38,6 @@ const Sidebar = () => {
           Týmy
         </Link>
       </nav>
-      {/* Footer area */}
       <div className="p-5 text-center">
         <button
           onClick={logout}

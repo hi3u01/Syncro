@@ -20,7 +20,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Veřejné cesty (BEZ Sidebaru) */}
         <Route
           path="/login"
           element={!user ? <Login /> : <Navigate to="/dashboard" />}
@@ -29,8 +28,6 @@ function App() {
           path="/register"
           element={!user ? <Register /> : <Navigate to="/dashboard" />}
         />
-
-        {/* Chráněné cesty (S Layoutem a Sidebarem) */}
         <Route
           path="/dashboard"
           element={
@@ -56,8 +53,6 @@ function App() {
             )
           }
         />
-
-        {/* Přesměrování všeho ostatního */}
         <Route
           path="*"
           element={<Navigate to={user ? "/dashboard" : "/login"} />}
