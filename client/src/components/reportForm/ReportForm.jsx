@@ -220,10 +220,7 @@ const ReportForm = ({ onReportSaved }) => {
                 5. Jaká byla tvoje nálada během dneška?
               </label>
               <div className="relative">
-                <Select
-                  value={stress}
-                  onValueChange={(e) => setStress(e.target.value)}
-                >
+                <Select value={mood} onValueChange={(value) => setMood(value)}>
                   <SelectTrigger className="bg-[#2a303c] w-full text-white !h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium text-[15px]">
                     <SelectValue />
                   </SelectTrigger>
