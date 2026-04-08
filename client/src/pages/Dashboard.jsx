@@ -1,5 +1,6 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
+import API from "../services/api";
 import { LogOut, UserCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import ReportForm from "../components/reportForm/ReportForm";
 import CoachKPICards from "../components/dashboard/CoachKPICards";
@@ -7,10 +8,62 @@ import WeeklyLoadChart from "../components/dashboard/WeeklyLoadCharts";
 import TeamWellnessRadar from "../components/dashboard/TeamWellnessRadar";
 import FatigueSleepTrendChart from "../components/dashboard/FatigueSleepTrendChart";
 import TeamHeatmapTable from "../components/dashboard/TeamHeatmapTable";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [teams, setTeams] = useState([]);
+  const [selectedTeamId, setSelectedTeamId] = useState("");
+  const [reports, setReports] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch teams
+  useEffect(() => {
+    if (user?.role === "coach") {
+      const fetchTeams = async () => {
+        try {
+          const { data } = await API.get("/teams");
+          setTeams(data);
+
+          if (data.length > 0) {
+            setSelectedTeamId(data[0]._id);
+          } else {
+            setIsLoading(false);
+          }
+        } catch (error) {
+          console.error("Chyba při načítání týmů:", error);
+          setIsLoading(false);
+        }
+      };
+      fetchTeams();
+    }
+  }, [user]);
+
+  // fetch reports for selected team
+  useEffect(() => {
+    if (user?.role === "coach" && selectedTeamId) {
+      const fetchReports = async () => {
+        setIsLoading(true);
+        try {
+          const { data } = await API.get(`/reports/team/${selectedTeamId}`);
+          setReports(data);
+          console.log("✅ ÚSPĚCH! Tady jsou reálná data z API:", data);
+        } catch (error) {
+          console.error("Chyba při načítání reportů:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchReports();
+    }
+  }, [selectedTeamId, user]);
 
   return (
     <div className="w-full text-white font-sans flex justify-center pt-10 pb-20 animate-in fade-in duration-500">
@@ -53,17 +106,44 @@ const Dashboard = () => {
             <ReportForm />
           ) : (
             <div className="w-full flex flex-col gap-6">
-              <h2 className="text-xl font-extrabold text-white tracking-tight mb-2">
-                Dnešní souhrn
-              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+                <h2 className="text-xl font-extrabold text-white tracking-tight">
+                  Dnešní souhrn
+                </h2>
 
-              <CoachKPICards />
-
+                {teams.length > 0 && (
+                  <div className="w-full sm:w-[220px]">
+                    <Select
+                      value={selectedTeamId}
+                      onValueChange={(value) => setSelectedTeamId(value)}
+                    >
+                      <SelectTrigger className="bg-[#2a303c] w-full text-white h-10 rounded-xl px-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-bold text-[12px] uppercase tracking-widest shadow-sm">
+                        <SelectValue placeholder="Vyberte tým" />
+                      </SelectTrigger>
+                      <SelectContent
+                        position="popper"
+                        className="bg-[#2a303c] border border-[#323946] shadow-xl rounded-xl overflow-hidden"
+                      >
+                        {teams.map((team) => (
+                          <SelectItem
+                            key={team._id}
+                            value={team._id}
+                            className="h-10 pl-4 pr-8 text-[12px] font-bold uppercase tracking-widest text-gray-300 focus:bg-[#3a4252] focus:text-white cursor-pointer rounded-none"
+                          >
+                            {team.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+              {/* TODO: hardcoded - take number of players from backend */}
+              <CoachKPICards reports={reports} totalPlayers={30} />
               <div className="flex items-center justify-between mt-6 mb-2">
                 <h2 className="text-xl font-extrabold text-white tracking-tight m-0">
                   Analytika
                 </h2>
-
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setCurrentSlide(0)}
@@ -99,23 +179,21 @@ const Dashboard = () => {
                   </button>
                 </div>
               </div>
-
               <div className="overflow-hidden w-full relative pb-4">
                 <div
                   className="flex transition-transform duration-500 ease-in-out"
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
                   <div className="min-w-full grid grid-cols-1 lg:grid-cols-2 gap-6 pr-4">
-                    <WeeklyLoadChart />
-                    <TeamWellnessRadar />
+                    <WeeklyLoadChart reports={reports} />
+                    <TeamWellnessRadar reports={reports} />
                   </div>
-
                   <div className="min-w-full">
-                    <FatigueSleepTrendChart />
+                    <FatigueSleepTrendChart reports={reports} />
                   </div>
                 </div>
               </div>
-              <TeamHeatmapTable />
+              <TeamHeatmapTable reports={reports} />
             </div>
           )}
         </div>
