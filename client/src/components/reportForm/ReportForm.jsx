@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "../../services/api";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -11,7 +11,8 @@ import {
 } from "../ui/select";
 
 const ReportForm = ({ onReportSaved }) => {
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [events, setEvents] = useState([]);
+  const [selectedEventId, setSelectedEventId] = useState("");
   const [rpe, setRpe] = useState("");
   const [duration, setDuration] = useState("");
   const [fatigue, setFatigue] = useState("");
@@ -21,6 +22,7 @@ const ReportForm = ({ onReportSaved }) => {
   const [mood, setMood] = useState("");
   const [note, setNote] = useState("");
   const [message, setMessage] = useState("");
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
 
   const stressOptions = [
     { value: "1", label: "1 - Velmi špatná" },
@@ -30,10 +32,43 @@ const ReportForm = ({ onReportSaved }) => {
     { value: "5", label: "5 - Výborná" },
   ];
 
+  useEffect(() => {
+    const fetchRecentEvents = async () => {
+      try {
+        setIsLoadingEvents(true);
+
+        const { data } = await API.get("/events/player/recent");
+        setEvents(data);
+
+        if (data.length > 0) {
+          handleEventChange(data[0]._id, data);
+        }
+      } catch (error) {
+        console.error("Chyba při načítání událostí:", error);
+      } finally {
+        setIsLoadingEvents(false);
+      }
+    };
+
+    fetchRecentEvents();
+  }, []);
+
+  const handleEventChange = (eventId, eventsList = events) => {
+    setSelectedEventId(eventId);
+    const event = eventsList.find((e) => e._id === eventId);
+
+    if (event && event.plannedDuration) {
+      setDuration(event.plannedDuration.toString());
+    } else {
+      setDuration("");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await API.post("/reports", {
+        eventId: selectedEventId,
         duration: Number(duration),
         rpe: Number(rpe),
         fatigue: Number(fatigue),
@@ -69,15 +104,15 @@ const ReportForm = ({ onReportSaved }) => {
         className="p-8 md:p-12 flex flex-col gap-8 "
       >
         <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-wide !mt-8 text-center">
-          Dotazník pro hráče/hráčky
+          Dotazník po aktivitě
         </h2>
 
         {message && (
           <div
             className={`p-4 rounded-xl text-sm font-bold text-center ${
               message.includes("Chyba")
-                ? "bg-red-500 text-white"
-                : "bg-green-500 text-white"
+                ? "bg-red-500/20 text-red-400 border border-red-500/50"
+                : "bg-green-500/20 text-green-400 border border-green-500/50"
             }`}
           >
             {message}
@@ -86,15 +121,39 @@ const ReportForm = ({ onReportSaved }) => {
 
         <div className="space-y-2">
           <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
-            Datum
+            Vyber aktivitu
           </label>
-          <Input
-            type="date"
-            required
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
-          />
+          <Select value={selectedEventId} onValueChange={handleEventChange}>
+            <SelectTrigger className="bg-[#2a303c] w-full text-white !h-12 rounded-lg !pl-4 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium text-[15px]">
+              <SelectValue
+                placeholder={
+                  isLoadingEvents ? "Načítám aktivity..." : "Vyber událost"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent className="bg-[#2a303c] border-none shadow-xl rounded-lg overflow-hidden w-full text-white">
+              {events.length === 0 && !isLoadingEvents ? (
+                <div className="p-3 text-sm text-gray-400 text-center">
+                  Žádné nedávné události
+                </div>
+              ) : (
+                events.map((event) => {
+                  const dateStr = new Date(event.date).toLocaleDateString(
+                    "cs-CZ",
+                  );
+                  return (
+                    <SelectItem
+                      key={event._id}
+                      value={event._id}
+                      className="h-12 pl-4 pr-8 text-[14px] font-medium text-white focus:bg-[#3a4252] focus:text-white cursor-pointer rounded-none"
+                    >
+                      {event.title || event.type} - {dateStr}
+                    </SelectItem>
+                  );
+                })
+              )}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="mt-2">
@@ -259,7 +318,8 @@ const ReportForm = ({ onReportSaved }) => {
 
         <Button
           type="submit"
-          className="w-full bg-[#4E4619] hover:bg-[#4b4e26] h-12 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 mt-4 flex items-center justify-center gap-2"
+          disabled={!selectedEventId}
+          className="w-full bg-[#4E4619] hover:bg-[#4b4e26] disabled:opacity-50 h-12 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 mt-4 flex items-center justify-center gap-2"
         >
           ODESLAT
         </Button>

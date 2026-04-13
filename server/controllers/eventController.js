@@ -40,6 +40,31 @@ const getTeamEvents = async (req, res) => {
   }
 };
 
+// GET /events/player/recent - get recent events for logged in player
+const getPlayerRecentEvents = async (req, res) => {
+  try {
+    const teamId = req.user.teamId;
+
+    if (!teamId) {
+      return res.status(400).json({ error: "Nejsi přiřazen k žádnému týmu." });
+    }
+
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const events = await Event.find({
+      teamId: teamId,
+      date: { $lte: endOfToday }, // only from today and earlier
+    })
+      .sort({ date: -1 })
+      .limit(10);
+
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // PUT /events/:id - update event
 const updateEvent = async (req, res) => {
   try {
@@ -91,6 +116,7 @@ const deleteEvent = async (req, res) => {
 module.exports = {
   createEvent,
   getTeamEvents,
+  getPlayerRecentEvents,
   updateEvent,
   deleteEvent,
 };
