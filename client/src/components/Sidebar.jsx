@@ -37,6 +37,17 @@ const Sidebar = () => {
         >
           Týmy
         </Link>
+
+        <Link
+          to="/calendar"
+          className={`flex items-center gap-3 h-10 px-4 py-3 no-underline font-bold uppercase tracking-widest transition-all duration-200 ${
+            isActive("/calendar")
+              ? "bg-[#4E4619] text-white shadow-lg"
+              : "bg-transparent text-gray-400 hover:bg-[#2a303c] hover:text-white"
+          }`}
+        >
+          Kalendář
+        </Link>
       </nav>
       <div className="p-5 text-center">
         <button

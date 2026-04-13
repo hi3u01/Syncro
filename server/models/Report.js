@@ -6,6 +6,11 @@ const ReportSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  eventId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Event",
+    required: true,
+  },
   date: {
     type: Date,
     default: Date.now,

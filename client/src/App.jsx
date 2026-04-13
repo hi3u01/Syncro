@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Teams from "./pages/Teams";
+import Calendar from "./pages/Calendar";
 import Layout from "./components/Layout";
 
 function App() {
@@ -44,12 +45,25 @@ function App() {
         <Route
           path="/teams"
           element={
-            user ? (
+            user && user.role === "coach" ? (
               <Layout>
                 <Teams />
               </Layout>
             ) : (
               <Navigate to="/login" />
+            )
+          }
+        />
+
+        <Route
+          path="/calendar"
+          element={
+            user && user.role === "coach" ? (
+              <Layout>
+                <Calendar />
+              </Layout>
+            ) : (
+              <Navigate to="/dashboard" />
             )
           }
         />

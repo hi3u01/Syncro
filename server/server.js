@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/users");
 const reportRoutes = require("./routes/reports");
 const teamsRoutes = require("./routes/teams");
+const eventRoutes = require("./routes/events");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/reports", reportRoutes);
 app.use("/teams", teamsRoutes);
+app.use("/events", eventRoutes);
 
 // Testing route
 app.get("/", (req, res) => {
