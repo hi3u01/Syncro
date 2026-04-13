@@ -13,6 +13,7 @@ import {
 const ReportForm = ({ onReportSaved }) => {
   const [events, setEvents] = useState([]);
   const [selectedEventId, setSelectedEventId] = useState("");
+  const [selectedEventType, setSelectedEventType] = useState("");
   const [rpe, setRpe] = useState("");
   const [duration, setDuration] = useState("");
   const [fatigue, setFatigue] = useState("");
@@ -36,7 +37,6 @@ const ReportForm = ({ onReportSaved }) => {
     const fetchRecentEvents = async () => {
       try {
         setIsLoadingEvents(true);
-
         const { data } = await API.get("/events/player/recent");
         setEvents(data);
 
@@ -57,20 +57,26 @@ const ReportForm = ({ onReportSaved }) => {
     setSelectedEventId(eventId);
     const event = eventsList.find((e) => e._id === eventId);
 
-    if (event && event.plannedDuration) {
-      setDuration(event.plannedDuration.toString());
-    } else {
-      setDuration("");
+    if (event) {
+      setSelectedEventType(event.type);
+      if (event.plannedDuration) {
+        setDuration(event.plannedDuration.toString());
+      } else {
+        setDuration("");
+      }
     }
   };
 
+  // Check if selected event is rest day or regeneration
+  const isRestDay =
+    selectedEventType === "Volno" || selectedEventType === "Regenerace";
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await API.post("/reports", {
         eventId: selectedEventId,
-        duration: Number(duration),
-        rpe: Number(rpe),
+        duration: isRestDay ? 0 : Number(duration),
+        rpe: isRestDay ? 0 : Number(rpe),
         fatigue: Number(fatigue),
         sleep: Number(sleep),
         soreness: Number(soreness),
@@ -99,10 +105,7 @@ const ReportForm = ({ onReportSaved }) => {
 
   return (
     <div className="w-full text-white font-sans">
-      <form
-        onSubmit={handleSubmit}
-        className="p-8 md:p-12 flex flex-col gap-8 "
-      >
+      <form onSubmit={handleSubmit} className="p-8 md:p-12 flex flex-col gap-8">
         <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-wide !mt-8 text-center">
           Dotazník po aktivitě
         </h2>
@@ -155,10 +158,16 @@ const ReportForm = ({ onReportSaved }) => {
             </SelectContent>
           </Select>
         </div>
-
-        <div className="mt-2">
-          <h3 className="text-xl px-2! font-bold text-gray-200 mb-6 border-b border-gray-700 pb-2">
+        <div
+          className={`mt-2 transition-all duration-300 ${isRestDay ? "opacity-40 grayscale pointer-events-none" : ""}`}
+        >
+          <h3 className="flex items-center gap-3 text-xl px-2! font-bold text-gray-200 mb-6 border-b border-gray-700 pb-2">
             Fyzická zátěž 💪
+            {isRestDay && (
+              <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-500 bg-emerald-900/20 px-2 py-1 rounded-md">
+                volno/regenerace
+              </span>
+            )}
           </h3>
 
           <div className="flex flex-col gap-8">
@@ -173,10 +182,11 @@ const ReportForm = ({ onReportSaved }) => {
                 type="number"
                 min="1"
                 max="10"
-                required
-                value={rpe}
+                required={!isRestDay}
+                disabled={isRestDay}
+                value={isRestDay ? 0 : rpe}
                 onChange={(e) => setRpe(e.target.value)}
-                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                className="bg-[#2a303c] text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px] disabled:opacity-70 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -187,10 +197,11 @@ const ReportForm = ({ onReportSaved }) => {
               <input
                 type="number"
                 min="1"
-                required
-                value={duration}
+                required={!isRestDay}
+                disabled={isRestDay}
+                value={isRestDay ? 0 : duration}
                 onChange={(e) => setDuration(e.target.value)}
-                className="bg-[#2a303c] w-full text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px]"
+                className="bg-[#2a303c] w-full text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px] disabled:opacity-70 disabled:cursor-not-allowed"
               />
             </div>
           </div>
