@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Radar,
   RadarChart,
@@ -8,15 +9,6 @@ import {
   Tooltip,
 } from "recharts";
 import { Target } from "lucide-react";
-
-// Mock data
-const data = [
-  { subject: "Spánek", vcera: 4.2, dnes: 3.5, fullMark: 5 },
-  { subject: "Únava", vcera: 3.1, dnes: 4.2, fullMark: 5 },
-  { subject: "Bolest", vcera: 2.8, dnes: 4.5, fullMark: 5 },
-  { subject: "Stres", vcera: 3.0, dnes: 3.2, fullMark: 5 },
-  { subject: "Nálada", vcera: 4.5, dnes: 3.8, fullMark: 5 },
-];
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -46,7 +38,69 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const TeamWellnessRadar = () => {
+const TeamWellnessRadar = ({ reports = [] }) => {
+  const chartData = useMemo(() => {
+    const now = new Date();
+
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    const startOfYesterday = new Date(
+      startOfToday.getTime() - 24 * 60 * 60 * 1000,
+    );
+
+    const reportsToday = reports.filter((r) => {
+      const d = new Date(r.eventId?.date || r.date);
+      return d >= startOfToday;
+    });
+
+    const reportsYesterday = reports.filter((r) => {
+      const d = new Date(r.eventId?.date || r.date);
+      return d >= startOfYesterday && d < startOfToday;
+    });
+
+    const getAvg = (arr, key) => {
+      if (arr.length === 0) return 0;
+      const sum = arr.reduce((acc, r) => acc + r[key], 0);
+      return Number((sum / arr.length).toFixed(1));
+    };
+
+    return [
+      {
+        subject: "Spánek",
+        vcera: getAvg(reportsYesterday, "sleep"),
+        dnes: getAvg(reportsToday, "sleep"),
+        fullMark: 5,
+      },
+      {
+        subject: "Únava",
+        vcera: getAvg(reportsYesterday, "fatigue"),
+        dnes: getAvg(reportsToday, "fatigue"),
+        fullMark: 5,
+      },
+      {
+        subject: "Bolest",
+        vcera: getAvg(reportsYesterday, "soreness"),
+        dnes: getAvg(reportsToday, "soreness"),
+        fullMark: 5,
+      },
+      {
+        subject: "Stres",
+        vcera: getAvg(reportsYesterday, "stress"),
+        dnes: getAvg(reportsToday, "stress"),
+        fullMark: 5,
+      },
+      {
+        subject: "Nálada",
+        vcera: getAvg(reportsYesterday, "mood"),
+        dnes: getAvg(reportsToday, "mood"),
+        fullMark: 5,
+      },
+    ];
+  }, [reports]);
+
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-6 shadow-lg w-full h-[400px] flex flex-col">
       <div className="flex items-center justify-between mb-2">
@@ -78,7 +132,7 @@ const TeamWellnessRadar = () => {
 
       <div className="flex-1 w-full -mt-4">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
+          <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
             <PolarGrid stroke="#2a303c" />
             <PolarAngleAxis
               dataKey="subject"

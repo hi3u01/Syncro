@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -10,28 +11,18 @@ import {
 } from "recharts";
 import { BarChart3 } from "lucide-react";
 
-// Mock data
-const data = [
-  { day: "Po", load: 300, type: "Lehký trénink" },
-  { day: "Út", load: 650, type: "Těžký trénink" },
-  { day: "St", load: 720, type: "Těžký trénink" },
-  { day: "Čt", load: 150, type: "Regenerace" },
-  { day: "Pá", load: 450, type: "Předzápasový" },
-  { day: "So", load: 850, type: "Zápas" },
-  { day: "Ne", load: 0, type: "Volno" },
-];
-
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
+    const data = payload[0].payload;
     return (
       <div className="bg-[#2a303c] border border-[#323946] p-4 rounded-xl shadow-xl">
         <p className="text-white font-bold mb-1">{label}</p>
         <p className="text-[#dce1a1] font-extrabold text-lg">
-          {payload[0].value}{" "}
+          {data.load}{" "}
           <span className="text-xs font-normal text-gray-400">A.U.</span>
         </p>
         <p className="text-[11px] text-gray-400 uppercase tracking-widest mt-2">
-          {payload[0].payload.type}
+          {data.type}
         </p>
       </div>
     );
@@ -39,7 +30,73 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const WeeklyLoadChart = () => {
+// Pomocná funkce pro správné lokální datum (řeší problém s časovým pásmem)
+const getLocalDateString = (dateInput) => {
+  const d = new Date(dateInput);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const WeeklyLoadChart = ({ reports = [] }) => {
+  const chartData = useMemo(() => {
+    const days = [];
+    const now = new Date();
+
+    const czechDays = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"];
+
+    // 1. Vygenerování posledních 7 dnů
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(now.getDate() - i);
+
+      days.push({
+        dateStr: getLocalDateString(d),
+        day: i === 0 ? "Dnes" : czechDays[d.getDay()],
+        load: 0,
+        type: "Volno",
+        isMatch: false,
+        reports: [],
+      });
+    }
+
+    // 2. Rozdělení reportů do dnů
+    reports.forEach((report) => {
+      // OPRAVA: Díváme se primárně na datum události. Pokud z nějakého důvodu chybí, použije se datum reportu.
+      const actualEventDate = report.eventId?.date || report.date;
+      if (!actualEventDate) return;
+
+      // OPRAVA: Použití bezpečné funkce pro lokální čas, žádné toISOString
+      const reportDateStr = getLocalDateString(actualEventDate);
+      const targetDay = days.find((d) => d.dateStr === reportDateStr);
+
+      if (targetDay) {
+        targetDay.reports.push(report);
+      }
+    });
+
+    // 3. Výpočet zátěže a typu události pro každý den
+    days.forEach((day) => {
+      if (day.reports.length > 0) {
+        const totalLoad = day.reports.reduce(
+          (sum, r) => sum + r.rpe * r.duration,
+          0,
+        );
+        day.load = Math.round(totalLoad / day.reports.length);
+
+        const eventType = day.reports[0].eventId?.type || "Aktivita";
+        day.type = eventType;
+
+        if (eventType === "Zápas") {
+          day.isMatch = true;
+        }
+      }
+    });
+
+    return days;
+  }, [reports]);
+
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-6 shadow-lg w-full h-[400px] flex flex-col">
       <div className="flex items-center gap-3 mb-6">
@@ -59,7 +116,7 @@ const WeeklyLoadChart = () => {
       <div className="flex-1 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={data}
+            data={chartData}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
             <CartesianGrid
@@ -91,10 +148,10 @@ const WeeklyLoadChart = () => {
             />
 
             <Bar dataKey="load" radius={[6, 6, 0, 0]} maxBarSize={50}>
-              {data.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.day === "So" ? "#dce1a1" : "#4E4619"}
+                  fill={entry.isMatch ? "#dce1a1" : "#4E4619"}
                   className="transition-all duration-300 hover:opacity-80"
                 />
               ))}

@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [teams, setTeams] = useState([]);
   const [selectedTeamId, setSelectedTeamId] = useState("");
   const [reports, setReports] = useState([]);
+  const [teamPlayers, setTeamPlayers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch teams
@@ -49,22 +50,26 @@ const Dashboard = () => {
   // fetch reports for selected team
   useEffect(() => {
     if (user?.role === "coach" && selectedTeamId) {
-      const fetchReports = async () => {
+      const fetchDashboardData = async () => {
         setIsLoading(true);
         try {
-          const { data } = await API.get(`/reports/team/${selectedTeamId}`);
-          setReports(data);
-          console.log("✅ ÚSPĚCH! Tady jsou reálná data z API:", data);
+          // Promise.all will wait for both req to finish before setting state
+          const [reportsRes, playersRes] = await Promise.all([
+            API.get(`/reports/team/${selectedTeamId}`),
+            API.get(`/teams/${selectedTeamId}/players`),
+          ]);
+
+          setReports(reportsRes.data);
+          setTeamPlayers(playersRes.data);
         } catch (error) {
-          console.error("Chyba při načítání reportů:", error);
+          console.error("Chyba při načítání dat:", error);
         } finally {
           setIsLoading(false);
         }
       };
-      fetchReports();
+      fetchDashboardData();
     }
   }, [selectedTeamId, user]);
-
   return (
     <div className="w-full text-white font-sans flex justify-center pt-10 pb-20 animate-in fade-in duration-500">
       <div className="w-[95%] max-w-[800px] flex flex-col">
@@ -108,7 +113,7 @@ const Dashboard = () => {
             <div className="w-full flex flex-col gap-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
                 <h2 className="text-xl font-extrabold text-white tracking-tight">
-                  Dnešní souhrn
+                  Týdenní souhrn
                 </h2>
 
                 {teams.length > 0 && (
@@ -138,8 +143,10 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
-              {/* TODO: hardcoded - take number of players from backend */}
-              <CoachKPICards reports={reports} totalPlayers={30} />
+              <CoachKPICards
+                reports={reports}
+                totalPlayers={teamPlayers.length}
+              />
               <div className="flex items-center justify-between mt-6 mb-2">
                 <h2 className="text-xl font-extrabold text-white tracking-tight m-0">
                   Analytika
@@ -193,7 +200,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <TeamHeatmapTable reports={reports} />
+              <TeamHeatmapTable reports={reports} players={teamPlayers} />
             </div>
           )}
         </div>

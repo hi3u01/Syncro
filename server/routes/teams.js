@@ -4,11 +4,12 @@ const { protect, coachOnly } = require("../middleware/auth");
 const {
   createTeam,
   getCoachTeams,
-  getTeamPlayers,
+  getAllPlayers,
+  getPlayersByTeam,
 } = require("../controllers/teamController");
 
 router.post("/", protect, coachOnly, createTeam);
 router.get("/", protect, coachOnly, getCoachTeams);
-router.get("/players", protect, coachOnly, getTeamPlayers);
-
+router.get("/players/list", protect, coachOnly, getAllPlayers);
+router.get("/:teamId/players", protect, getPlayersByTeam);
 module.exports = router;

@@ -45,17 +45,15 @@ const getCoachTeams = async (req, res) => {
   }
 };
 
-// GET /teams/players - Get all players in the coach's team
-const getTeamPlayers = async (req, res) => {
+// GET /teams/players/list - get all players from all teams of the coach
+const getAllPlayers = async (req, res) => {
   try {
     const teams = await Team.find({ coachId: req.user._id });
 
     if (!teams) {
       return res.status(404).json({ message: "Team not found." });
     }
-
     const teamIds = teams.map((team) => team._id);
-
     const players = await User.find({
       role: "player",
       teamId: { $in: teamIds },
@@ -67,8 +65,32 @@ const getTeamPlayers = async (req, res) => {
   }
 };
 
+// GET /teams/:teamId/players - Get players from team coach have picked
+const getPlayersByTeam = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+
+    const team = await Team.findOne({ _id: teamId, coachId: req.user._id });
+    if (!team) {
+      return res
+        .status(403)
+        .json({ message: "Access denied or team not found." });
+    }
+
+    const players = await User.find({
+      role: "player",
+      teamId: teamId,
+    }).select("-password");
+
+    res.json(players);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   createTeam,
   getCoachTeams,
-  getTeamPlayers,
+  getAllPlayers,
+  getPlayersByTeam,
 };

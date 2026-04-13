@@ -31,7 +31,7 @@ const Teams = () => {
         : [teamRes.data];
       setTeams(teamsData);
 
-      const playersRes = await API.get("/teams/players");
+      const playersRes = await API.get("/teams/players/list");
       setPlayers(playersRes.data);
     } catch (err) {
       if (err.response?.status !== 404) {

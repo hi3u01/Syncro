@@ -1,102 +1,9 @@
-import { useState } from "react";
-import { MessageSquare, Activity } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
-
-// Mock data
-const mockTeams = [
-  { id: "team_A", name: "A-Tým (Muži)" },
-  { id: "team_U19", name: "Junioři U19" },
-];
-
-const mockPlayers = [
-  {
-    id: 1,
-    teamId: "team_A",
-    name: "Jan Novák",
-    rpe: 8,
-    duration: 90,
-    sleep: 2,
-    fatigue: 4,
-    soreness: 5,
-    stress: 3,
-    mood: 2,
-    note: "Tahá mě levý hamstring, potřebuju fyzio.",
-  },
-  {
-    id: 2,
-    teamId: "team_A",
-    name: "Petr Svoboda",
-    rpe: 6,
-    duration: 90,
-    sleep: 4,
-    fatigue: 2,
-    soreness: 3,
-    stress: 2,
-    mood: 4,
-    note: "",
-  },
-  {
-    id: 3,
-    teamId: "team_A",
-    name: "Tomáš Dvořák",
-    rpe: 4,
-    duration: 60,
-    sleep: 5,
-    fatigue: 1,
-    soreness: 1,
-    stress: 1,
-    mood: 5,
-    note: "",
-  },
-  // U19
-  {
-    id: 4,
-    teamId: "team_U19",
-    name: "Lukáš Černý",
-    rpe: 9,
-    duration: 90,
-    sleep: 3,
-    fatigue: 5,
-    soreness: 4,
-    stress: 4,
-    mood: 3,
-    note: "Hrozně těžký trénink včera.",
-  },
-  {
-    id: 5,
-    teamId: "team_U19",
-    name: "Martin Kříž",
-    rpe: 5,
-    duration: 60,
-    sleep: 4,
-    fatigue: 3,
-    soreness: 2,
-    stress: 2,
-    mood: 4,
-    note: "",
-  },
-  {
-    id: 6,
-    teamId: "team_U19",
-    name: "Jakub Veselý",
-    rpe: 7,
-    duration: 90,
-    sleep: 3,
-    fatigue: 3,
-    soreness: 3,
-    stress: 2,
-    mood: 3,
-    note: "",
-  },
-];
+import { useMemo } from "react";
+import { MessageSquare, Activity, XCircle } from "lucide-react";
 
 const getWellnessColor = (value, inverse = false) => {
+  if (value === "-") return "bg-[#1a1a1a] text-gray-600 border-[#2a303c]";
+
   if (inverse) {
     if (value >= 4) return "bg-red-900/30 text-red-400 border-red-900/50";
     if (value === 3)
@@ -111,17 +18,53 @@ const getWellnessColor = (value, inverse = false) => {
 };
 
 const getRpeColor = (value) => {
+  if (value === "-") return "bg-[#1a1a1a] text-gray-600 border-[#2a303c]";
+
   if (value >= 8) return "bg-red-900/30 text-red-400 border-red-900/50";
   if (value >= 6)
     return "bg-yellow-900/20 text-yellow-500 border-yellow-900/30";
   return "bg-emerald-900/20 text-emerald-400 border-emerald-900/30";
 };
 
-const TeamHeatmapTable = () => {
-  const [selectedTeamId, setSelectedTeamId] = useState(mockTeams[0].id);
-  const filteredPlayers = mockPlayers.filter(
-    (player) => player.teamId === selectedTeamId,
-  );
+const TeamHeatmapTable = ({ reports = [], players = [] }) => {
+  const tableData = useMemo(() => {
+    const now = new Date();
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+
+    return players.map((player) => {
+      // newest report of the player
+      const latestReport = reports.find((r) => {
+        const repPlayerId = r.playerId?._id || r.playerId;
+        return repPlayerId === player._id;
+      });
+
+      // check if report was submitted today
+      let reportToUse = null;
+      if (latestReport) {
+        const submittedDate = new Date(latestReport.date);
+        if (submittedDate >= startOfToday) {
+          reportToUse = latestReport;
+        }
+      }
+
+      return {
+        id: player._id,
+        name: `${player.firstName} ${player.lastName}`,
+        hasReport: !!reportToUse,
+        rpe: reportToUse?.rpe || "-",
+        sleep: reportToUse?.sleep || "-",
+        fatigue: reportToUse?.fatigue || "-",
+        soreness: reportToUse?.soreness || "-",
+        stress: reportToUse?.stress || "-",
+        mood: reportToUse?.mood || "-",
+        note: reportToUse?.note || "",
+      };
+    });
+  }, [reports, players]);
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl shadow-lg w-full overflow-hidden mt-6 flex flex-col">
@@ -139,38 +82,12 @@ const TeamHeatmapTable = () => {
             </p>
           </div>
         </div>
-
-        <div className="w-[200px]">
-          <Select
-            value={selectedTeamId}
-            onValueChange={(value) => setSelectedTeamId(value)}
-          >
-            <SelectTrigger className="bg-[#2a303c] w-full text-white h-10 rounded-xl px-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-bold text-[12px] uppercase tracking-widest shadow-sm">
-              <SelectValue placeholder="Vyberte tým" />
-            </SelectTrigger>
-
-            <SelectContent
-              position="popper"
-              className="bg-[#2a303c] border border-[#323946] shadow-xl rounded-xl overflow-hidden w-[200px]"
-            >
-              {mockTeams.map((team) => (
-                <SelectItem
-                  key={team.id}
-                  value={team.id}
-                  className="h-10 pl-4 pr-8 text-[12px] font-bold uppercase tracking-widest text-gray-300 focus:bg-[#3a4252] focus:text-white cursor-pointer rounded-none"
-                >
-                  {team.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       <div className="overflow-x-auto">
-        {filteredPlayers.length === 0 ? (
+        {players.length === 0 ? (
           <div className="p-10 text-center text-gray-500 text-sm font-medium uppercase tracking-widest">
-            V tomto týmu zatím nejsou žádná data.
+            V tomto týmu zatím nejsou žádní hráči.
           </div>
         ) : (
           <table className="w-full text-left border-collapse">
@@ -203,13 +120,26 @@ const TeamHeatmapTable = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#2a303c]">
-              {filteredPlayers.map((player) => (
+              {tableData.map((player) => (
                 <tr
                   key={player.id}
                   className="hover:bg-[#2a303c]/20 transition-colors"
                 >
-                  <td className="p-4 font-bold text-white whitespace-nowrap">
-                    {player.name}
+                  <td className="p-4 font-bold text-white whitespace-nowrap flex items-center gap-2">
+                    {!player.hasReport && (
+                      <XCircle
+                        size={14}
+                        className="text-gray-600"
+                        title="Dnes nevyplněno"
+                      />
+                    )}
+                    <span
+                      className={
+                        player.hasReport ? "text-white" : "text-gray-400"
+                      }
+                    >
+                      {player.name}
+                    </span>
                   </td>
 
                   <td className="p-4 text-center">
@@ -262,7 +192,7 @@ const TeamHeatmapTable = () => {
                         className="flex items-center justify-end gap-2 text-red-400 group cursor-help"
                         title={player.note}
                       >
-                        <span className="text-[11px] max-w-[120px]  font-medium">
+                        <span className="text-[11px] max-w-[120px] font-medium truncate">
                           {player.note}
                         </span>
                         <MessageSquare size={16} />

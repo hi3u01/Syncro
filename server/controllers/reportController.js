@@ -43,18 +43,19 @@ const getTeamReports = async (req, res) => {
     const players = await User.find({ teamId: teamId, role: "player" });
     const playerIds = players.map((p) => p._id);
 
-    // 7 days ago
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const dateLimit = new Date();
+    dateLimit.setDate(dateLimit.getDate() - 15);
 
-    // get reports for all players in the team from the last 7 days
     const reports = await Report.find({
       playerId: { $in: playerIds },
-      date: { $gte: sevenDaysAgo },
-    }).populate("playerId", "firstName lastName");
+      date: { $gte: dateLimit },
+    })
+      .populate("playerId", "firstName lastName")
+      .populate("eventId", "type title date");
 
     res.json(reports);
   } catch (err) {
+    console.error("Backend chyba v getTeamReports:", err);
     res.status(500).json({ error: err.message });
   }
 };

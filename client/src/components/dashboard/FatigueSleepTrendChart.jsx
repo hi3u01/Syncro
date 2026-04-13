@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -8,17 +9,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { TrendingUp } from "lucide-react";
-
-// Mock data
-const data = [
-  { day: "1.4.", sleep: 4.2, fatigue: 2.1 },
-  { day: "2.4.", sleep: 3.8, fatigue: 2.5 },
-  { day: "3.4.", sleep: 3.0, fatigue: 3.8 },
-  { day: "4.4.", sleep: 2.5, fatigue: 4.5 },
-  { day: "5.4.", sleep: 4.5, fatigue: 2.0 },
-  { day: "6.4.", sleep: 4.0, fatigue: 2.2 },
-  { day: "Dnes", sleep: 3.8, fatigue: 2.8 },
-];
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -48,10 +38,63 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const FatigueSleepTrendChart = () => {
+const getLocalDateString = (dateInput) => {
+  const d = new Date(dateInput);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const FatigueSleepTrendChart = ({ reports = [] }) => {
+  const chartData = useMemo(() => {
+    const days = [];
+    const now = new Date();
+
+    // Last 7 days
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(now.getDate() - i);
+
+      const displayDay = `${d.getDate()}.${d.getMonth() + 1}.`;
+
+      days.push({
+        dateStr: getLocalDateString(d),
+        day: i === 0 ? "Dnes" : displayDay,
+        sleep: null,
+        fatigue: null,
+        reports: [],
+      });
+    }
+
+    // Divide reports into days
+    reports.forEach((report) => {
+      const actualEventDate = report.eventId?.date || report.date;
+      if (!actualEventDate) return;
+
+      const reportDateStr = getLocalDateString(actualEventDate);
+      const targetDay = days.find((d) => d.dateStr === reportDateStr);
+
+      if (targetDay) {
+        targetDay.reports.push(report);
+      }
+    });
+
+    days.forEach((day) => {
+      if (day.reports.length > 0) {
+        const totalSleep = day.reports.reduce((sum, r) => sum + r.sleep, 0);
+        const totalFatigue = day.reports.reduce((sum, r) => sum + r.fatigue, 0);
+
+        day.sleep = Number((totalSleep / day.reports.length).toFixed(1));
+        day.fatigue = Number((totalFatigue / day.reports.length).toFixed(1));
+      }
+    });
+
+    return days;
+  }, [reports]);
+
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-6 shadow-lg w-full h-[400px] flex flex-col">
-      {/* Hlavička grafu */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-[#2a303c]/50 rounded-xl">
@@ -82,7 +125,7 @@ const FatigueSleepTrendChart = () => {
       <div className="flex-1 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={data}
+            data={chartData}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
             <CartesianGrid
@@ -117,6 +160,7 @@ const FatigueSleepTrendChart = () => {
               dataKey="sleep"
               stroke="#60a5fa"
               strokeWidth={3}
+              connectNulls={true}
               dot={{ r: 4, fill: "#1a1a1a", stroke: "#60a5fa", strokeWidth: 2 }}
               activeDot={{
                 r: 6,
@@ -132,6 +176,7 @@ const FatigueSleepTrendChart = () => {
               dataKey="fatigue"
               stroke="#f87171"
               strokeWidth={3}
+              connectNulls={true}
               dot={{ r: 4, fill: "#1a1a1a", stroke: "#f87171", strokeWidth: 2 }}
               activeDot={{
                 r: 6,
