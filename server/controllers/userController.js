@@ -1,88 +1,50 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const Team = require("../models/Team");
+const asyncHandler = require("../middleware/asyncHandler");
+const userService = require("../services/userService");
+const teamService = require("../services/teamService");
+const dashboardService = require("../services/dashboardService");
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
-  });
-};
-
-// POST /users/register - register new user
-const registerUser = async (req, res) => {
-  try {
-    const { firstName, lastName, email, password, role, joinCode } = req.body;
-
-    // check if user exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res
-        .status(400)
-        .json({ error: "Uživatel s tímto e-mailem již existuje." });
-    }
-
-    let assignedTeamId = null;
-
-    // if player and provided a join code
-    if (role === "player" && joinCode) {
-      const team = await Team.findOne({ joinCode });
-      if (!team) {
-        return res.status(400).json({ error: "Invalid team invite code." });
-      }
-      assignedTeamId = team._id;
-    }
-
-    // create user
-    const user = await User.create({
-      firstName,
-      lastName,
-      email,
-      password,
-      role,
-      teamId: assignedTeamId,
-    });
-
-    // return data and token
-    res.status(201).json({
-      _id: user._id,
-      firstName: user.firstName,
-      email: user.email,
-      role: user.role,
-      teamId: user.teamId,
-      token: generateToken(user._id),
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+const getUsers = asyncHandler(async (req, res) => {
+  if (req.user.role === "admin") {
+    return res.json(await userService.getAllUsers());
   }
-};
-
-// POST /users/login - login user
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // find user by email
-    const user = await User.findOne({ email });
-
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-        teamId: user.teamId,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ error: "Neplatný email nebo heslo." });
-    }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  if (req.user.role === "coach" && req.query.role === "player") {
+    return res.json(await teamService.getAllCoachPlayers(req.user._id));
   }
-};
+  return res.status(403).json({ error: "Přístup zamítnut." });
+});
+
+const getUser = asyncHandler(async (req, res) => {
+  res.json(await userService.getUserById(req.params.id));
+});
+
+const updateUser = asyncHandler(async (req, res) => {
+  res.json(await userService.updateUser(req.params.id, req.body));
+});
+
+const deleteUser = asyncHandler(async (req, res) => {
+  res.json(await userService.deleteUser(req.params.id));
+});
+
+const getUserReports = asyncHandler(async (req, res) => {
+  const reports = await userService.getPlayerReportsForCoach(
+    req.params.id,
+    req.user._id,
+  );
+  res.json(reports);
+});
+
+const getUserAnalytics = asyncHandler(async (req, res) => {
+  await userService.assertCoachOwnsPlayer(req.params.id, req.user._id);
+  const weeks = Number(req.query.weeks) || 8;
+  const data = await dashboardService.getPlayerAnalytics(req.params.id, weeks);
+  res.json(data);
+});
 
 module.exports = {
-  registerUser,
-  loginUser,
+  getUsers,
+  getUser,
+  updateUser,
+  deleteUser,
+  getUserReports,
+  getUserAnalytics,
 };

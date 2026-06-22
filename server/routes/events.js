@@ -3,16 +3,16 @@ const router = express.Router();
 const { protect, coachOnly } = require("../middleware/auth");
 const {
   createEvent,
-  getTeamEvents,
-  getPlayerRecentEvents,
+  getEvents,
   updateEvent,
   deleteEvent,
+  getEventReports,
 } = require("../controllers/eventController");
 
 router.post("/", protect, coachOnly, createEvent);
-router.get("/team/:teamId", protect, getTeamEvents);
-router.get("/player/recent", protect, getPlayerRecentEvents);
-router.put("/:id", protect, coachOnly, updateEvent);
+router.get("/", protect, getEvents);
+router.get("/:id/reports", protect, coachOnly, getEventReports);
+router.patch("/:id", protect, coachOnly, updateEvent);
 router.delete("/:id", protect, coachOnly, deleteEvent);
 
 module.exports = router;

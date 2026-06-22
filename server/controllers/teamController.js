@@ -1,96 +1,60 @@
-const crypto = require("crypto");
-const Team = require("../models/Team");
-const User = require("../models/User");
+const asyncHandler = require("../middleware/asyncHandler");
+const teamService = require("../services/teamService");
+const eventService = require("../services/eventService");
+const dashboardService = require("../services/dashboardService");
 
-// POST /teams - Create a new team
-const createTeam = async (req, res) => {
-  try {
-    const { name } = req.body;
-    // Generate a random 6-character HEX string
-    let generatedCode = crypto.randomBytes(3).toString("hex").toUpperCase();
+const createTeam = asyncHandler(async (req, res) => {
+  const team = await teamService.createTeam(req.user._id, req.body);
+  res.status(201).json(team);
+});
 
-    let isUnique = false;
-    while (!isUnique) {
-      const existingTeam = await Team.findOne({ joinCode: generatedCode });
-      if (existingTeam) {
-        generatedCode = crypto.randomBytes(3).toString("hex").toUpperCase();
-      } else {
-        isUnique = true;
-      }
-    }
+const getCoachTeams = asyncHandler(async (req, res) => {
+  res.json(await teamService.getCoachTeams(req.user._id));
+});
 
-    const team = await Team.create({
-      name,
-      joinCode: generatedCode,
-      coachId: req.user._id,
-    });
+const getTeam = asyncHandler(async (req, res) => {
+  res.json(await teamService.getTeamById(req.params.id, req.user._id));
+});
 
-    await User.findByIdAndUpdate(req.user._id, { teamId: team._id });
-    res.status(201).json(team);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+const updateTeam = asyncHandler(async (req, res) => {
+  res.json(await teamService.updateTeam(req.params.id, req.user._id, req.body));
+});
 
-// GET /teams/ - Get coach's team info
-const getCoachTeams = async (req, res) => {
-  try {
-    const team = await Team.find({ coachId: req.user._id });
-    if (!team) {
-      return res.status(404).json({ message: "No team found for this coach." });
-    }
-    res.json(team);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+const joinTeam = asyncHandler(async (req, res) => {
+  const team = await teamService.joinTeam(req.user._id, req.body.joinCode);
+  res.json(team);
+});
 
-// GET /teams/players/list - get all players from all teams of the coach
-const getAllPlayers = async (req, res) => {
-  try {
-    const teams = await Team.find({ coachId: req.user._id });
+const removePlayer = asyncHandler(async (req, res) => {
+  const result = await teamService.removePlayer(
+    req.params.teamId,
+    req.params.playerId,
+    req.user._id,
+  );
+  res.json(result);
+});
 
-    if (!teams) {
-      return res.status(404).json({ message: "Team not found." });
-    }
-    const teamIds = teams.map((team) => team._id);
-    const players = await User.find({
-      role: "player",
-      teamId: { $in: teamIds },
-    }).select("-password");
+const getTeamPlayers = asyncHandler(async (req, res) => {
+  res.json(await teamService.getTeamPlayers(req.params.id, req.user._id));
+});
 
-    res.json(players);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+const getTeamEvents = asyncHandler(async (req, res) => {
+  res.json(await eventService.getTeamEvents(req.params.id, req.user._id));
+});
 
-// GET /teams/:teamId/players - Get players from team coach have picked
-const getPlayersByTeam = async (req, res) => {
-  try {
-    const { teamId } = req.params;
-
-    const team = await Team.findOne({ _id: teamId, coachId: req.user._id });
-    if (!team) {
-      return res
-        .status(403)
-        .json({ message: "Access denied or team not found." });
-    }
-
-    const players = await User.find({
-      role: "player",
-      teamId: teamId,
-    }).select("-password");
-
-    res.json(players);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+const getTeamDashboard = asyncHandler(async (req, res) => {
+  await teamService.assertCoachOwnsTeam(req.params.id, req.user._id);
+  res.json(await dashboardService.getTeamDashboard(req.params.id));
+});
 
 module.exports = {
   createTeam,
   getCoachTeams,
-  getAllPlayers,
-  getPlayersByTeam,
+  getTeam,
+  updateTeam,
+  joinTeam,
+  removePlayer,
+  getTeamPlayers,
+  getTeamEvents,
+  getTeamDashboard,
 };
