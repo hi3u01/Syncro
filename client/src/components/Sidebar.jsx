@@ -42,20 +42,23 @@ const Sidebar = () => {
         </h2>
       </div>
       <nav className="flex-1 flex flex-col">
-        {links.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            className={`flex items-center h-10 gap-3 px-4 py-3 no-underline font-bold uppercase tracking-widest transition-all duration-200 ${
-              isActive(to)
-                ? "bg-[#4E4619] text-white shadow-lg"
-                : "bg-transparent text-gray-400 hover:bg-[#2a303c] hover:text-white"
-            }`}
-          >
-            <Icon size={18} />
-            {label}
-          </Link>
-        ))}
+        {links.map((link) => {
+          const Icon = link.icon;
+          return (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`flex items-center h-10 gap-3 px-4 py-3 no-underline font-bold uppercase tracking-widest transition-all duration-200 ${
+                isActive(link.to)
+                  ? "bg-[#4E4619] text-white shadow-lg"
+                  : "bg-transparent text-gray-400 hover:bg-[#2a303c] hover:text-white"
+              }`}
+            >
+              <Icon size={18} />
+              {link.label}
+            </Link>
+          );
+        })}
       </nav>
       <div className="p-5 text-center">
         <button

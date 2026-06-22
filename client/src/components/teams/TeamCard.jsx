@@ -1,6 +1,6 @@
-import { Copy, Users } from "lucide-react";
+import { Copy, Users, UserMinus } from "lucide-react";
 
-const TeamCard = ({ team, players }) => {
+const TeamCard = ({ team, players, onRemovePlayer }) => {
   const copyToClipboard = () => {
     if (team?.joinCode) {
       navigator.clipboard.writeText(team.joinCode);
@@ -60,9 +60,20 @@ const TeamCard = ({ team, players }) => {
                 <span className="text-gray-200 font-bold group-hover:text-white transition-colors">
                   {player.firstName} {player.lastName}
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest bg-[#2a303c] text-gray-400 px-3 py-1 rounded-full">
-                  Hráč
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest bg-[#2a303c] text-gray-400 px-3 py-1 rounded-full">
+                    Hráč
+                  </span>
+                  {onRemovePlayer && (
+                    <button
+                      onClick={() => onRemovePlayer(team._id, player._id)}
+                      title="Odebrat z týmu"
+                      className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-all"
+                    >
+                      <UserMinus size={16} />
+                    </button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>

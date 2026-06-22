@@ -39,27 +39,30 @@ const TrendBadge = ({ value, invert = false }) => {
   );
 };
 
-const KpiCard = ({ label, value, suffix, icon: Icon, trend, invert }) => (
-  <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-5 shadow-lg">
-    <div className="flex justify-between items-start mb-4">
-      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-        {label}
-      </p>
-      <div className="p-2 bg-[#2a303c]/50 rounded-xl">
-        <Icon size={18} className="text-gray-300" />
+const KpiCard = ({ label, value, suffix, icon, trend, invert }) => {
+  const Icon = icon;
+  return (
+    <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-5 shadow-lg">
+      <div className="flex justify-between items-start mb-4">
+        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+          {label}
+        </p>
+        <div className="p-2 bg-[#2a303c]/50 rounded-xl">
+          <Icon size={18} className="text-gray-300" />
+        </div>
       </div>
-    </div>
     <h3 className="text-3xl font-extrabold text-white tracking-tight m-0">
       {fmt(value)}
       {suffix && value !== null && value !== undefined && (
         <span className="text-sm text-gray-500 font-medium ml-1">{suffix}</span>
       )}
     </h3>
-    <p className="text-[12px] font-bold mt-2">
-      <TrendBadge value={trend} invert={invert} />
-    </p>
-  </div>
-);
+      <p className="text-[12px] font-bold mt-2">
+        <TrendBadge value={trend} invert={invert} />
+      </p>
+    </div>
+  );
+};
 
 const PlayerDetail = () => {
   const { id } = useParams();

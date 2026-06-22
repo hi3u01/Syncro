@@ -42,6 +42,16 @@ const Teams = () => {
     }
   };
 
+  const handleRemovePlayer = async (teamId, playerId) => {
+    if (!window.confirm("Opravdu odebrat hráče z týmu?")) return;
+    try {
+      await API.delete(`/teams/${teamId}/players/${playerId}`);
+      setPlayers((prev) => prev.filter((p) => p._id !== playerId));
+    } catch (err) {
+      setError(err.response?.data?.error || "Hráče se nepodařilo odebrat.");
+    }
+  };
+
   if (loading)
     return (
       <div className="p-10 text-center text-gray-500 font-bold uppercase tracking-widest animate-pulse">
@@ -130,7 +140,12 @@ const Teams = () => {
           {teams.map((team) => {
             const teamPlayers = players.filter((p) => p.teamId === team._id);
             return (
-              <TeamCard key={team._id} team={team} players={teamPlayers} />
+              <TeamCard
+                key={team._id}
+                team={team}
+                players={teamPlayers}
+                onRemovePlayer={handleRemovePlayer}
+              />
             );
           })}
         </div>
