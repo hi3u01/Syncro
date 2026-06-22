@@ -7,10 +7,16 @@ const EventSchema = new mongoose.Schema(
       ref: "Team",
       required: true,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     date: {
       type: Date,
       required: true,
     },
+
     type: {
       type: String,
       required: true,
@@ -18,9 +24,19 @@ const EventSchema = new mongoose.Schema(
     },
     title: {
       type: String,
+      trim: true,
     },
     plannedDuration: {
       type: Number,
+    },
+    plannedRpe: {
+      type: Number,
+      min: 1,
+      max: 10,
+    },
+    description: {
+      type: String,
+      trim: true,
     },
   },
   { timestamps: true },

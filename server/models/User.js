@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["player", "coach"],
+      enum: ["player", "coach", "admin"],
       default: "player",
     },
     teamId: {
@@ -34,22 +34,28 @@ const UserSchema = new mongoose.Schema(
       ref: "Team",
       default: null,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
   },
 );
 
+// Hash the password before saving (only when it has changed).
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    return;
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
-// compare password
+// Compare a candidate password against the stored hash at login.
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
