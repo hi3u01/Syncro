@@ -19,7 +19,7 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await API.post("/users/login", { email, password });
+      const response = await API.post("/auth/login", { email, password });
       login(response.data);
       navigate("/dashboard");
     } catch (err) {

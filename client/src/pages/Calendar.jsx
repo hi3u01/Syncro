@@ -51,7 +51,7 @@ const Calendar = () => {
     if (!selectedTeamId) return;
     setIsLoading(true);
     try {
-      const { data } = await API.get(`/events/team/${selectedTeamId}`);
+      const { data } = await API.get(`/teams/${selectedTeamId}/events`);
       setEvents(data);
     } catch (error) {
       console.error("Chyba při načítání událostí:", error);

@@ -1,70 +1,43 @@
-import { useMemo } from "react";
 import { MessageSquare, Activity, XCircle } from "lucide-react";
 
 const getWellnessColor = (value, inverse = false) => {
-  if (value === "-") return "bg-[#1a1a1a] text-gray-600 border-[#2a303c]";
+  if (value === "-" || value === null || value === undefined)
+    return "bg-[#1a1a1a] text-gray-600 border-[#2a303c]";
 
   if (inverse) {
     if (value >= 4) return "bg-red-900/30 text-red-400 border-red-900/50";
     if (value === 3)
       return "bg-yellow-900/20 text-yellow-500 border-yellow-900/30";
     return "bg-emerald-900/20 text-emerald-400 border-emerald-900/30";
-  } else {
-    if (value <= 2) return "bg-red-900/30 text-red-400 border-red-900/50";
-    if (value === 3)
-      return "bg-yellow-900/20 text-yellow-500 border-yellow-900/30";
-    return "bg-emerald-900/20 text-emerald-400 border-emerald-900/30";
   }
-};
-
-const getRpeColor = (value) => {
-  if (value === "-") return "bg-[#1a1a1a] text-gray-600 border-[#2a303c]";
-
-  if (value >= 8) return "bg-red-900/30 text-red-400 border-red-900/50";
-  if (value >= 6)
-    return "bg-yellow-900/20 text-yellow-500 border-yellow-900/30";
+  if (value <= 2) return "bg-red-900/30 text-red-400 border-red-900/50";
+  if (value === 3) return "bg-yellow-900/20 text-yellow-500 border-yellow-900/30";
   return "bg-emerald-900/20 text-emerald-400 border-emerald-900/30";
 };
 
-const TeamHeatmapTable = ({ reports = [], players = [] }) => {
-  const tableData = useMemo(() => {
-    const now = new Date();
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
+const getRpeColor = (value) => {
+  if (value === "-" || value === null || value === undefined)
+    return "bg-[#1a1a1a] text-gray-600 border-[#2a303c]";
+  if (value >= 8) return "bg-red-900/30 text-red-400 border-red-900/50";
+  if (value >= 6) return "bg-yellow-900/20 text-yellow-500 border-yellow-900/30";
+  return "bg-emerald-900/20 text-emerald-400 border-emerald-900/30";
+};
 
-    return players.map((player) => {
-      // newest report of the player
-      const latestReport = reports.find((r) => {
-        const repPlayerId = r.playerId?._id || r.playerId;
-        return repPlayerId === player._id;
-      });
+const cell = (value) => (value === null || value === undefined ? "-" : value);
 
-      // check if report was submitted today
-      let reportToUse = null;
-      if (latestReport) {
-        const submittedDate = new Date(latestReport.date);
-        if (submittedDate >= startOfToday) {
-          reportToUse = latestReport;
-        }
-      }
-
-      return {
-        id: player._id,
-        name: `${player.firstName} ${player.lastName}`,
-        hasReport: !!reportToUse,
-        rpe: reportToUse?.rpe || "-",
-        sleep: reportToUse?.sleep || "-",
-        fatigue: reportToUse?.fatigue || "-",
-        soreness: reportToUse?.soreness || "-",
-        stress: reportToUse?.stress || "-",
-        mood: reportToUse?.mood || "-",
-        note: reportToUse?.note || "",
-      };
-    });
-  }, [reports, players]);
+const TeamHeatmapTable = ({ rows = [] }) => {
+  const tableData = (rows || []).map((r) => ({
+    id: r.id,
+    name: r.name,
+    hasReport: r.hasReport,
+    rpe: cell(r.rpe),
+    sleep: cell(r.wellness?.sleep),
+    fatigue: cell(r.wellness?.fatigue),
+    soreness: cell(r.wellness?.soreness),
+    stress: cell(r.wellness?.stress),
+    mood: cell(r.wellness?.mood),
+    note: r.note || "",
+  }));
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl shadow-lg w-full overflow-hidden mt-6 flex flex-col">
@@ -78,14 +51,14 @@ const TeamHeatmapTable = ({ reports = [], players = [] }) => {
               Detailní přehled hráčů
             </h2>
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-              Dnešní data
+              Poslední dotazník
             </p>
           </div>
         </div>
       </div>
 
       <div className="overflow-x-auto">
-        {players.length === 0 ? (
+        {tableData.length === 0 ? (
           <div className="p-10 text-center text-gray-500 text-sm font-medium uppercase tracking-widest">
             V tomto týmu zatím nejsou žádní hráči.
           </div>
@@ -96,24 +69,16 @@ const TeamHeatmapTable = ({ reports = [], players = [] }) => {
                 <th className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">
                   Hráč
                 </th>
-                <th className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">
-                  RPE
-                </th>
-                <th className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">
-                  Spánek
-                </th>
-                <th className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">
-                  Únava
-                </th>
-                <th className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">
-                  Bolest
-                </th>
-                <th className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">
-                  Stres
-                </th>
-                <th className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">
-                  Nálada
-                </th>
+                {["RPE", "Spánek", "Únava", "Bolest", "Stres", "Nálada"].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center"
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
                 <th className="p-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">
                   Poznámka
                 </th>
@@ -127,11 +92,7 @@ const TeamHeatmapTable = ({ reports = [], players = [] }) => {
                 >
                   <td className="p-4 font-bold text-white whitespace-nowrap flex items-center gap-2">
                     {!player.hasReport && (
-                      <XCircle
-                        size={14}
-                        className="text-gray-600"
-                        title="Dnes nevyplněno"
-                      />
+                      <XCircle size={14} className="text-gray-600" />
                     )}
                     <span
                       className={
@@ -149,7 +110,6 @@ const TeamHeatmapTable = ({ reports = [], players = [] }) => {
                       {player.rpe}
                     </span>
                   </td>
-
                   <td className="p-4 text-center">
                     <span
                       className={`inline-block w-8 text-center px-2 py-1 rounded-md text-[13px] font-extrabold border ${getWellnessColor(player.sleep, false)}`}
@@ -189,7 +149,7 @@ const TeamHeatmapTable = ({ reports = [], players = [] }) => {
                   <td className="p-4 text-right">
                     {player.note ? (
                       <div
-                        className="flex items-center justify-end gap-2 text-red-400 group cursor-help"
+                        className="flex items-center justify-end gap-2 text-red-400 cursor-help"
                         title={player.note}
                       >
                         <span className="text-[11px] max-w-[120px] font-medium truncate">

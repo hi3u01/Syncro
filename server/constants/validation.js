@@ -1,6 +1,3 @@
-// Single source of truth for input ranges shared across models, services and
-// validation middleware. The client mirrors these in client/src/lib/validation.js.
-
 const RPE = { MIN: 1, MAX: 10 };
 const WELLNESS = { MIN: 1, MAX: 5 };
 const NOTE_MAX = 200;

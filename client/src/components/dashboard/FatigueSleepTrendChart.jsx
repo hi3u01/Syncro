@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -38,60 +37,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const getLocalDateString = (dateInput) => {
-  const d = new Date(dateInput);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const FatigueSleepTrendChart = ({ reports = [] }) => {
-  const chartData = useMemo(() => {
-    const days = [];
-    const now = new Date();
-
-    // Last 7 days
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(now.getDate() - i);
-
-      const displayDay = `${d.getDate()}.${d.getMonth() + 1}.`;
-
-      days.push({
-        dateStr: getLocalDateString(d),
-        day: i === 0 ? "Dnes" : displayDay,
-        sleep: null,
-        fatigue: null,
-        reports: [],
-      });
-    }
-
-    // Divide reports into days
-    reports.forEach((report) => {
-      const actualEventDate = report.eventId?.date || report.date;
-      if (!actualEventDate) return;
-
-      const reportDateStr = getLocalDateString(actualEventDate);
-      const targetDay = days.find((d) => d.dateStr === reportDateStr);
-
-      if (targetDay) {
-        targetDay.reports.push(report);
-      }
-    });
-
-    days.forEach((day) => {
-      if (day.reports.length > 0) {
-        const totalSleep = day.reports.reduce((sum, r) => sum + r.sleep, 0);
-        const totalFatigue = day.reports.reduce((sum, r) => sum + r.fatigue, 0);
-
-        day.sleep = Number((totalSleep / day.reports.length).toFixed(1));
-        day.fatigue = Number((totalFatigue / day.reports.length).toFixed(1));
-      }
-    });
-
-    return days;
-  }, [reports]);
+const FatigueSleepTrendChart = ({ data = [] }) => {
+  const chartData = data || [];
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-6 shadow-lg w-full h-[400px] flex flex-col">
@@ -133,7 +80,6 @@ const FatigueSleepTrendChart = ({ reports = [] }) => {
               stroke="#2a303c"
               vertical={false}
             />
-
             <XAxis
               dataKey="day"
               stroke="#6b7280"
@@ -142,7 +88,6 @@ const FatigueSleepTrendChart = ({ reports = [] }) => {
               axisLine={false}
               dy={10}
             />
-
             <YAxis
               domain={[0, 5]}
               stroke="#6b7280"
@@ -151,9 +96,7 @@ const FatigueSleepTrendChart = ({ reports = [] }) => {
               axisLine={false}
               tickCount={6}
             />
-
             <Tooltip content={<CustomTooltip />} />
-
             <Line
               type="monotone"
               name="Spánek"
@@ -162,14 +105,8 @@ const FatigueSleepTrendChart = ({ reports = [] }) => {
               strokeWidth={3}
               connectNulls={true}
               dot={{ r: 4, fill: "#1a1a1a", stroke: "#60a5fa", strokeWidth: 2 }}
-              activeDot={{
-                r: 6,
-                fill: "#60a5fa",
-                stroke: "#1a1a1a",
-                strokeWidth: 2,
-              }}
+              activeDot={{ r: 6, fill: "#60a5fa", stroke: "#1a1a1a", strokeWidth: 2 }}
             />
-
             <Line
               type="monotone"
               name="Únava"
@@ -178,12 +115,7 @@ const FatigueSleepTrendChart = ({ reports = [] }) => {
               strokeWidth={3}
               connectNulls={true}
               dot={{ r: 4, fill: "#1a1a1a", stroke: "#f87171", strokeWidth: 2 }}
-              activeDot={{
-                r: 6,
-                fill: "#f87171",
-                stroke: "#1a1a1a",
-                strokeWidth: 2,
-              }}
+              activeDot={{ r: 6, fill: "#f87171", stroke: "#1a1a1a", strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>

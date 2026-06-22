@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -30,72 +29,12 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-// Pomocná funkce pro správné lokální datum (řeší problém s časovým pásmem)
-const getLocalDateString = (dateInput) => {
-  const d = new Date(dateInput);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const WeeklyLoadChart = ({ reports = [] }) => {
-  const chartData = useMemo(() => {
-    const days = [];
-    const now = new Date();
-
-    const czechDays = ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"];
-
-    // 1. Vygenerování posledních 7 dnů
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(now.getDate() - i);
-
-      days.push({
-        dateStr: getLocalDateString(d),
-        day: i === 0 ? "Dnes" : czechDays[d.getDay()],
-        load: 0,
-        type: "Volno",
-        isMatch: false,
-        reports: [],
-      });
-    }
-
-    // 2. Rozdělení reportů do dnů
-    reports.forEach((report) => {
-      // OPRAVA: Díváme se primárně na datum události. Pokud z nějakého důvodu chybí, použije se datum reportu.
-      const actualEventDate = report.eventId?.date || report.date;
-      if (!actualEventDate) return;
-
-      // OPRAVA: Použití bezpečné funkce pro lokální čas, žádné toISOString
-      const reportDateStr = getLocalDateString(actualEventDate);
-      const targetDay = days.find((d) => d.dateStr === reportDateStr);
-
-      if (targetDay) {
-        targetDay.reports.push(report);
-      }
-    });
-
-    // 3. Výpočet zátěže a typu události pro každý den
-    days.forEach((day) => {
-      if (day.reports.length > 0) {
-        const totalLoad = day.reports.reduce(
-          (sum, r) => sum + r.rpe * r.duration,
-          0,
-        );
-        day.load = Math.round(totalLoad / day.reports.length);
-
-        const eventType = day.reports[0].eventId?.type || "Aktivita";
-        day.type = eventType;
-
-        if (eventType === "Zápas") {
-          day.isMatch = true;
-        }
-      }
-    });
-
-    return days;
-  }, [reports]);
+const WeeklyLoadChart = ({
+  data = [],
+  title = "Týdenní zátěž týmu",
+  subtitle = "Průměrný Load (RPE × Minuty)",
+}) => {
+  const chartData = data || [];
 
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-6 shadow-lg w-full h-[400px] flex flex-col">
@@ -105,10 +44,10 @@ const WeeklyLoadChart = ({ reports = [] }) => {
         </div>
         <div>
           <h2 className="text-xl font-extrabold text-white tracking-tight m-0">
-            Týdenní zátěž týmu
+            {title}
           </h2>
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-            Průměrný Load (RPE × Minuty)
+            {subtitle}
           </p>
         </div>
       </div>
@@ -124,7 +63,6 @@ const WeeklyLoadChart = ({ reports = [] }) => {
               stroke="#2a303c"
               vertical={false}
             />
-
             <XAxis
               dataKey="day"
               stroke="#6b7280"
@@ -133,20 +71,16 @@ const WeeklyLoadChart = ({ reports = [] }) => {
               axisLine={false}
               dy={10}
             />
-
             <YAxis
               stroke="#6b7280"
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `${value}`}
             />
-
             <Tooltip
               content={<CustomTooltip />}
               cursor={{ fill: "#2a303c", opacity: 0.4 }}
             />
-
             <Bar dataKey="load" radius={[6, 6, 0, 0]} maxBarSize={50}>
               {chartData.map((entry, index) => (
                 <Cell

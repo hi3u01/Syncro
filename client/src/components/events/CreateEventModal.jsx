@@ -65,7 +65,7 @@ const CreateEventModal = ({
       };
 
       if (editData) {
-        await API.put(`/events/${editData._id}`, payload);
+        await API.patch(`/events/${editData._id}`, payload);
       } else {
         await API.post("/events", payload);
       }

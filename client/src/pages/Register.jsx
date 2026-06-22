@@ -41,7 +41,7 @@ const Register = () => {
         payload.joinCode = joinCode.trim();
       }
 
-      const response = await API.post("/users/register", payload);
+      const response = await API.post("/auth/register", payload);
 
       login(response.data);
       navigate("/dashboard");

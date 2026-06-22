@@ -11,12 +11,23 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Teams from "./pages/Teams";
 import Calendar from "./pages/Calendar";
+import Players from "./pages/Players";
+import PlayerDetail from "./pages/PlayerDetail";
+import MyProgram from "./pages/MyProgram";
+import History from "./pages/History";
+import Profile from "./pages/Profile";
 import Layout from "./components/Layout";
 
 function App() {
   const { user, loading } = useContext(AuthContext);
 
   if (loading) return <div>Načítání...</div>;
+
+  const guarded = (element, role) => {
+    if (!user) return <Navigate to="/login" />;
+    if (role && user.role !== role) return <Navigate to="/dashboard" />;
+    return <Layout>{element}</Layout>;
+  };
 
   return (
     <Router>
@@ -29,44 +40,23 @@ function App() {
           path="/register"
           element={!user ? <Register /> : <Navigate to="/dashboard" />}
         />
-        <Route
-          path="/dashboard"
-          element={
-            user ? (
-              <Layout>
-                <Dashboard />
-              </Layout>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
 
-        <Route
-          path="/teams"
-          element={
-            user && user.role === "coach" ? (
-              <Layout>
-                <Teams />
-              </Layout>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
+        <Route path="/dashboard" element={guarded(<Dashboard />)} />
+        <Route path="/profile" element={guarded(<Profile />)} />
 
+        {/* Coach-only */}
+        <Route path="/teams" element={guarded(<Teams />, "coach")} />
+        <Route path="/players" element={guarded(<Players />, "coach")} />
         <Route
-          path="/calendar"
-          element={
-            user && user.role === "coach" ? (
-              <Layout>
-                <Calendar />
-              </Layout>
-            ) : (
-              <Navigate to="/dashboard" />
-            )
-          }
+          path="/players/:id"
+          element={guarded(<PlayerDetail />, "coach")}
         />
+        <Route path="/calendar" element={guarded(<Calendar />, "coach")} />
+
+        {/* Player-only */}
+        <Route path="/my-program" element={guarded(<MyProgram />, "player")} />
+        <Route path="/history" element={guarded(<History />, "player")} />
+
         <Route
           path="*"
           element={<Navigate to={user ? "/dashboard" : "/login"} />}

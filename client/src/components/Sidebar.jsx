@@ -1,12 +1,38 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import {
+  LogOut,
+  LayoutDashboard,
+  Users,
+  UserRound,
+  CalendarDays,
+  ClipboardList,
+  History,
+  UserCircle,
+} from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
+const COACH_LINKS = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/teams", label: "Týmy", icon: Users },
+  { to: "/players", label: "Hráči", icon: UserRound },
+  { to: "/calendar", label: "Program", icon: CalendarDays },
+  { to: "/profile", label: "Profil", icon: UserCircle },
+];
+
+const PLAYER_LINKS = [
+  { to: "/dashboard", label: "Dotazník", icon: ClipboardList },
+  { to: "/my-program", label: "Můj program", icon: CalendarDays },
+  { to: "/history", label: "Historie", icon: History },
+  { to: "/profile", label: "Profil", icon: UserCircle },
+];
+
 const Sidebar = () => {
   const location = useLocation();
+  const { user, logout } = useContext(AuthContext);
   const isActive = (path) => location.pathname === path;
-  const { logout } = useContext(AuthContext);
+
+  const links = user?.role === "coach" ? COACH_LINKS : PLAYER_LINKS;
 
   return (
     <aside className="w-[250px] bg-[#1a1a1a] text-white flex flex-col h-screen sticky top-0 border-r border-[#2a303c]">
@@ -15,44 +41,26 @@ const Sidebar = () => {
           SYNCRO
         </h2>
       </div>
-      <nav className=" flex-1 flex flex-col ">
-        <Link
-          to="/dashboard"
-          className={`flex items-center h-10 gap-3 px-4 py-3 no-underline font-bold uppercase tracking-widest transition-all duration-200 ${
-            isActive("/dashboard")
-              ? "bg-[#4E4619] text-white shadow-lg"
-              : "bg-transparent text-gray-400 hover:bg-[#2a303c] hover:text-white"
-          }`}
-        >
-          Dashboard
-        </Link>
-
-        <Link
-          to="/teams"
-          className={`flex items-center gap-3 h-10 px-4 py-3 no-underline  font-bold uppercase tracking-widest transition-all duration-200 ${
-            isActive("/teams")
-              ? "bg-[#4E4619] text-white shadow-lg"
-              : "bg-transparent text-gray-400 hover:bg-[#2a303c] hover:text-white"
-          }`}
-        >
-          Týmy
-        </Link>
-
-        <Link
-          to="/calendar"
-          className={`flex items-center gap-3 h-10 px-4 py-3 no-underline font-bold uppercase tracking-widest transition-all duration-200 ${
-            isActive("/calendar")
-              ? "bg-[#4E4619] text-white shadow-lg"
-              : "bg-transparent text-gray-400 hover:bg-[#2a303c] hover:text-white"
-          }`}
-        >
-          Kalendář
-        </Link>
+      <nav className="flex-1 flex flex-col">
+        {links.map(({ to, label, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            className={`flex items-center h-10 gap-3 px-4 py-3 no-underline font-bold uppercase tracking-widest transition-all duration-200 ${
+              isActive(to)
+                ? "bg-[#4E4619] text-white shadow-lg"
+                : "bg-transparent text-gray-400 hover:bg-[#2a303c] hover:text-white"
+            }`}
+          >
+            <Icon size={18} />
+            {label}
+          </Link>
+        ))}
       </nav>
       <div className="p-5 text-center">
         <button
           onClick={logout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#2a303c] hover:bg-red-900/30 text-gray-400 hover:text-red-400 border border-transparent hover:border-red-900/50 text-[12px] font-bold  transition-all uppercase tracking-widest mb-4"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#2a303c] hover:bg-red-900/30 text-gray-400 hover:text-red-400 border border-transparent hover:border-red-900/50 text-[12px] font-bold transition-all uppercase tracking-widest mb-4"
         >
           <LogOut size={16} /> Odhlásit se
         </button>

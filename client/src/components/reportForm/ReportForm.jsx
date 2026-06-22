@@ -37,7 +37,7 @@ const ReportForm = ({ onReportSaved }) => {
     const fetchRecentEvents = async () => {
       try {
         setIsLoadingEvents(true);
-        const { data } = await API.get("/events/player/recent");
+        const { data } = await API.get("/events");
         setEvents(data);
 
         if (data.length > 0) {
@@ -75,13 +75,14 @@ const ReportForm = ({ onReportSaved }) => {
     try {
       await API.post("/reports", {
         eventId: selectedEventId,
-        duration: isRestDay ? 0 : Number(duration),
         rpe: isRestDay ? 0 : Number(rpe),
-        fatigue: Number(fatigue),
-        sleep: Number(sleep),
-        soreness: Number(soreness),
-        stress: Number(stress),
-        mood: Number(mood),
+        wellness: {
+          fatigue: Number(fatigue),
+          sleep: Number(sleep),
+          soreness: Number(soreness),
+          stress: Number(stress),
+          mood: Number(mood),
+        },
         note,
       });
 
