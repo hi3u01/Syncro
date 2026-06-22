@@ -40,20 +40,22 @@ const getTeamEvents = async (teamId, coachId) => {
   return Event.find({ teamId }).sort({ date: -1 });
 };
 
-// Coach: events for a team they own (teamId required).
-// Player: recent events (today and earlier) from their own team.
 const getEventsForUser = async (user, query) => {
   if (user.role === "coach") {
     if (!query.teamId) throw new ApiError(400, "Chybí parametr teamId.");
     return getTeamEvents(query.teamId, user._id);
   }
   if (!user.teamId) throw new ApiError(400, "Nejsi přiřazen k žádnému týmu.");
-  return Event.find({
-    teamId: user.teamId,
-    date: { $lte: endOfDay(new Date()) },
-  })
-    .sort({ date: -1 })
-    .limit(10);
+
+  if (query.scope === "recent") {
+    return Event.find({
+      teamId: user.teamId,
+      date: { $lte: endOfDay(new Date()) },
+    })
+      .sort({ date: -1 })
+      .limit(10);
+  }
+  return Event.find({ teamId: user.teamId }).sort({ date: -1 });
 };
 
 const updateEvent = async (eventId, coachId, data) => {

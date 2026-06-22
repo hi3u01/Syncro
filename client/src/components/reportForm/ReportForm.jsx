@@ -37,7 +37,7 @@ const ReportForm = ({ onReportSaved }) => {
     const fetchRecentEvents = async () => {
       try {
         setIsLoadingEvents(true);
-        const { data } = await API.get("/events");
+        const { data } = await API.get("/events?scope=recent");
         setEvents(data);
 
         if (data.length > 0) {
