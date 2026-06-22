@@ -53,6 +53,9 @@ const register = async ({
 };
 
 const login = async ({ email, password }) => {
+  if (typeof email !== "string" || typeof password !== "string") {
+    throw new ApiError(401, "Neplatný email nebo heslo.");
+  }
   const user = await User.findOne({ email });
   if (!user || !(await user.matchPassword(password))) {
     throw new ApiError(401, "Neplatný email nebo heslo.");

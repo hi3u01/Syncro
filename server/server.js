@@ -2,7 +2,9 @@ const express = require("express");
 require("dotenv").config();
 
 const cors = require("cors");
+const validateEnv = require("./config/validateEnv");
 const connectDB = require("./config/db");
+const sanitize = require("./middleware/sanitize");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const reportRoutes = require("./routes/reports");
@@ -10,14 +12,19 @@ const teamsRoutes = require("./routes/teams");
 const eventRoutes = require("./routes/events");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
+// Verify required secrets exist before doing anything else.
+validateEnv();
+
 const app = express();
 
 // Connection to database
 connectDB();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+// Restrict CORS to the known client origin (override with CLIENT_URL in production).
+app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
+app.use(express.json({ limit: "100kb" }));
+app.use(sanitize);
 
 app.get("/", (req, res) => {
   res.send("SYNCRO API is running");
