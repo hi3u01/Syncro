@@ -1,6 +1,9 @@
 const crypto = require("crypto");
 const Team = require("../models/Team");
 const User = require("../models/User");
+const Report = require("../models/Report");
+const metrics = require("./metricsService");
+const { addDays, startOfDay } = require("../utils/dates");
 const ApiError = require("../utils/ApiError");
 
 const generateUniqueJoinCode = async () => {
@@ -69,9 +72,38 @@ const getTeamPlayers = async (teamId, coachId) => {
 const getAllCoachPlayers = async (coachId) => {
   const teams = await Team.find({ coachId }).select("_id");
   const teamIds = teams.map((t) => t._id);
-  return User.find({ role: "player", teamId: { $in: teamIds } }).select(
-    "-password",
-  );
+  const players = await User.find({ role: "player", teamId: { $in: teamIds } })
+    .select("-password")
+    .lean();
+
+  if (players.length === 0) return players;
+
+  const since = addDays(startOfDay(new Date()), -30);
+  const reports = await Report.find({
+    playerId: { $in: players.map((p) => p._id) },
+    date: { $gte: since },
+  }).populate("eventId", "date");
+
+  const latestByPlayer = new Map();
+  reports.forEach((r) => {
+    const id = String(r.playerId);
+    const prev = latestByPlayer.get(id);
+    if (!prev || metrics.reportDate(r) > metrics.reportDate(prev)) {
+      latestByPlayer.set(id, r);
+    }
+  });
+
+  return players.map((p) => {
+    const latest = latestByPlayer.get(String(p._id));
+    return {
+      ...p,
+      metrics: {
+        trainingLoad: latest ? (latest.trainingLoad ?? null) : null,
+        fatigue: latest ? (latest.wellness?.fatigue ?? null) : null,
+        stress: latest ? (latest.wellness?.stress ?? null) : null,
+      },
+    };
+  });
 };
 
 module.exports = {
