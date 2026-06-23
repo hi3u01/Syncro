@@ -13,12 +13,10 @@ const NotificationSchema = new mongoose.Schema(
       enum: ["player", "coach"],
       required: true,
     },
-    // The player the notification is about (used for coach-facing alerts).
     playerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    // The event the notification relates to (used for player-facing reminders).
     eventId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Event",

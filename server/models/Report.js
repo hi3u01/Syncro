@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const { RPE, WELLNESS, NOTE_MAX } = require("../constants/validation");
 
-// Hooper wellness sub-document (each item on a 1-5 scale).
 const WellnessSchema = new mongoose.Schema(
   {
     fatigue: {
@@ -50,7 +49,6 @@ const ReportSchema = new mongoose.Schema(
       ref: "Event",
       required: true,
     },
-    // Denormalised so team-wide queries don't need to resolve players first.
     teamId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Team",
@@ -84,7 +82,7 @@ const ReportSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// A player submits at most one report per event.
+// A player submits at most one report per event
 ReportSchema.index({ playerId: 1, eventId: 1 }, { unique: true });
 
 module.exports = mongoose.model("Report", ReportSchema);

@@ -48,57 +48,21 @@ const last7DaySeries = (reports, loadFor) => {
 const avgTrainingLoad = (dayReports) =>
   metrics.mean(dayReports.map((r) => r.trainingLoad || 0));
 
-const fatigueSleepTrend = (reports) => {
-  const today = startOfDay(new Date());
-  const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = addDays(today, -i);
-    days.push({
-      dateStr: localDateString(d),
-      day: i === 0 ? "Dnes" : `${d.getDate()}.${d.getMonth() + 1}.`,
-      sleep: null,
-      fatigue: null,
-    });
-  }
-  const byDay = {};
-  days.forEach((d) => (byDay[d.dateStr] = []));
-  reports.forEach((r) => {
-    const key = localDateString(metrics.reportDate(r));
-    if (byDay[key]) byDay[key].push(r);
-  });
-  days.forEach((day) => {
-    const dr = byDay[day.dateStr];
-    if (dr.length > 0) {
-      const w = metrics.wellnessAverages(dr);
-      day.sleep = w.sleep === null ? null : Number(w.sleep.toFixed(1));
-      day.fatigue = w.fatigue === null ? null : Number(w.fatigue.toFixed(1));
-    }
-  });
-  return days;
+const WELLNESS_META = {
+  fatigue: { label: "Únava", higherIsBetter: false },
+  sleep: { label: "Spánek", higherIsBetter: true },
+  soreness: { label: "Bolest", higherIsBetter: false },
+  stress: { label: "Stres", higherIsBetter: false },
+  mood: { label: "Nálada", higherIsBetter: true },
 };
 
-const teamWellnessRadar = (reports) => {
-  const today = startOfDay(new Date());
-  const yesterday = addDays(today, -1);
-  const todayReports = reports.filter((r) => metrics.reportDate(r) >= today);
-  const yesterdayReports = reports.filter((r) => {
-    const d = metrics.reportDate(r);
-    return d >= yesterday && d < today;
-  });
-  const todayAvg = metrics.wellnessAverages(todayReports);
-  const yAvg = metrics.wellnessAverages(yesterdayReports);
-  const labels = {
-    sleep: "Spánek",
-    fatigue: "Únava",
-    soreness: "Bolest",
-    stress: "Stres",
-    mood: "Nálada",
-  };
+const teamWellnessSummary = (latestEventReports) => {
+  const avg = metrics.wellnessAverages(latestEventReports);
   return WELLNESS_KEYS.map((k) => ({
-    subject: labels[k],
-    dnes: todayAvg[k] === null ? 0 : Number(todayAvg[k].toFixed(1)),
-    vcera: yAvg[k] === null ? 0 : Number(yAvg[k].toFixed(1)),
-    fullMark: 5,
+    key: k,
+    label: WELLNESS_META[k].label,
+    higherIsBetter: WELLNESS_META[k].higherIsBetter,
+    value: avg[k] === null ? null : Number(avg[k].toFixed(1)),
   }));
 };
 
@@ -205,8 +169,7 @@ const getTeamDashboard = async (teamId) => {
       },
     },
     weeklyLoad: last7DaySeries(reports, avgTrainingLoad),
-    wellnessRadar: teamWellnessRadar(reports),
-    fatigueSleepTrend: fatigueSleepTrend(reports),
+    wellnessSummary: teamWellnessSummary(latestEventReports),
     heatmap: buildHeatmap(players, reports),
   };
 };

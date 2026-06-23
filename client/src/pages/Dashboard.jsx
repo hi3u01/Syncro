@@ -1,13 +1,11 @@
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import API from "../services/api";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import ReportForm from "../components/reportForm/ReportForm";
 import JoinTeamModal from "../components/teams/JoinTeamModal";
 import CoachKPICards from "../components/dashboard/CoachKPICards";
 import WeeklyLoadChart from "../components/dashboard/WeeklyLoadCharts";
-import TeamWellnessRadar from "../components/dashboard/TeamWellnessRadar";
-import FatigueSleepTrendChart from "../components/dashboard/FatigueSleepTrendChart";
+import TeamWellnessSummary from "../components/dashboard/TeamWellnessSummary";
 import TeamHeatmapTable from "../components/dashboard/TeamHeatmapTable";
 import PageHeader from "../components/PageHeader";
 import {
@@ -20,7 +18,6 @@ import {
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [teams, setTeams] = useState([]);
   const [selectedTeamId, setSelectedTeamId] = useState("");
   const [dashboard, setDashboard] = useState(null);
@@ -119,53 +116,11 @@ const Dashboard = () => {
               <h2 className="text-xl font-extrabold text-white tracking-tight m-0">
                 Analytika
               </h2>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCurrentSlide(0)}
-                  disabled={currentSlide === 0}
-                  className={`p-1.5 rounded-lg transition-all ${
-                    currentSlide === 0
-                      ? "text-gray-600 cursor-not-allowed"
-                      : "bg-[#2a303c] hover:bg-[#323946] text-white active:scale-95"
-                  }`}
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <div className="flex gap-1.5 mx-1">
-                  <div
-                    className={`w-1.5 h-1.5 rounded-full transition-all ${currentSlide === 0 ? "bg-[#dce1a1] w-3" : "bg-gray-600"}`}
-                  />
-                  <div
-                    className={`w-1.5 h-1.5 rounded-full transition-all ${currentSlide === 1 ? "bg-[#dce1a1] w-3" : "bg-gray-600"}`}
-                  />
-                </div>
-                <button
-                  onClick={() => setCurrentSlide(1)}
-                  disabled={currentSlide === 1}
-                  className={`p-1.5 rounded-lg transition-all ${
-                    currentSlide === 1
-                      ? "text-gray-600 cursor-not-allowed"
-                      : "bg-[#2a303c] hover:bg-[#323946] text-white active:scale-95"
-                  }`}
-                >
-                  <ChevronRight size={20} />
-                </button>
-              </div>
             </div>
 
-            <div className="overflow-hidden w-full relative pb-4">
-              <div
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-              >
-                <div className="min-w-full grid grid-cols-1 lg:grid-cols-2 gap-6 pr-4">
-                  <WeeklyLoadChart data={dashboard?.weeklyLoad} />
-                  <TeamWellnessRadar data={dashboard?.wellnessRadar} />
-                </div>
-                <div className="min-w-full">
-                  <FatigueSleepTrendChart data={dashboard?.fatigueSleepTrend} />
-                </div>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <WeeklyLoadChart data={dashboard?.weeklyLoad} />
+              <TeamWellnessSummary data={dashboard?.wellnessSummary} />
             </div>
 
             <TeamHeatmapTable rows={dashboard?.heatmap} />
