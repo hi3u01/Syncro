@@ -22,17 +22,10 @@ const TeamSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   },
 );
 
-// Team membership is authoritatively held on User.teamId.
-// The `players` virtual just derives the roster for convenience when fetching a team.
-TeamSchema.virtual("players", {
-  ref: "User",
-  localField: "_id",
-  foreignField: "teamId",
-});
+// Team membership is authoritatively held on User.teamId
+// (queried directly via User.find — see teamService).
 
 module.exports = mongoose.model("Team", TeamSchema);
