@@ -18,7 +18,55 @@ import ReportHistory from "../components/reports/ReportHistory";
 
 const fmt = (v) => (v === null || v === undefined ? "–" : v);
 
-const TrendBadge = ({ value, invert = false }) => {
+const round1 = (v) =>
+  v === null || v === undefined ? v : Math.round(v * 10) / 10;
+
+const STRONG_CHANGE = 0.25;
+
+const trendStrength = (value, trend) => {
+  if (!trend) return "flat";
+  const prev = value - trend;
+  const pct = prev ? Math.abs(trend / prev) : 1;
+  return pct >= STRONG_CHANGE ? "strong" : "mild";
+};
+
+const getHint = (metric, value, trend) => {
+  if (value === null || value === undefined) return null;
+  const strength = trendStrength(value, trend);
+  const up = trend > 0;
+  switch (metric) {
+    case "weeklyTL":
+      if (strength === "flat") return "Stabilní zátěž";
+      if (up) return strength === "strong" ? "Hodně zatížený" : "Roste zátěž";
+      return strength === "strong"
+        ? "Lehký týden, může přidat"
+        : "Mírně nižší zátěž";
+    case "monotony":
+      if (strength === "flat") return "Vyvážený týden";
+      if (up)
+        return strength === "strong"
+          ? "Jednotvárná zátěž, prostřídej"
+          : "Méně pestrý týden";
+      return "Pestřejší rozložení zátěže";
+    case "strain":
+      if (strength === "flat") return "Napětí beze změny";
+      if (up)
+        return strength === "strong"
+          ? "Vyšší riziko přetížení"
+          : "Roste napětí";
+      return "Klesající napětí";
+    case "reportCount":
+      if (strength === "flat") return "Vyplňuje stejně";
+      if (up) return "Lépe vyplňuje dotazníky";
+      return strength === "strong"
+        ? "Málo dotazníků, připomeň"
+        : "Méně dotazníků";
+    default:
+      return null;
+  }
+};
+
+const TrendBadge = ({ value, invert = false, neutralDown = false }) => {
   if (value === null || value === undefined || value === 0) {
     return (
       <span className="flex items-center gap-1 text-gray-500">
@@ -26,21 +74,35 @@ const TrendBadge = ({ value, invert = false }) => {
       </span>
     );
   }
+  const neutral = neutralDown && value < 0;
   const bad = invert ? value < 0 : value > 0;
   const Icon = value > 0 ? TrendingUp : TrendingDown;
+  const color = neutral
+    ? "text-gray-400"
+    : bad
+      ? "text-red-400"
+      : "text-emerald-400";
   return (
-    <span
-      className={`flex items-center gap-1 ${bad ? "text-red-400" : "text-emerald-400"}`}
-    >
+    <span className={`flex items-center gap-1 ${color}`}>
       <Icon size={14} />
       {value > 0 ? "+" : ""}
-      {value} vs. min. týden
+      {round1(value)} vs. min. týden
     </span>
   );
 };
 
-const KpiCard = ({ label, value, suffix, icon, trend, invert }) => {
+const KpiCard = ({
+  label,
+  value,
+  suffix,
+  icon,
+  trend,
+  invert,
+  metric,
+  neutralDown,
+}) => {
   const Icon = icon;
+  const hint = getHint(metric, value, trend);
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-5 shadow-lg">
       <div className="flex justify-between items-start mb-4">
@@ -51,15 +113,20 @@ const KpiCard = ({ label, value, suffix, icon, trend, invert }) => {
           <Icon size={18} className="text-gray-300" />
         </div>
       </div>
-    <h3 className="text-3xl font-extrabold text-white tracking-tight m-0">
-      {fmt(value)}
-      {suffix && value !== null && value !== undefined && (
-        <span className="text-sm text-gray-500 font-medium ml-1">{suffix}</span>
-      )}
-    </h3>
+      <h3 className="text-3xl font-extrabold text-white tracking-tight m-0">
+        {fmt(value)}
+        {suffix && value !== null && value !== undefined && (
+          <span className="text-sm text-gray-500 font-medium ml-1">
+            {suffix}
+          </span>
+        )}
+      </h3>
       <p className="text-[12px] font-bold mt-2">
-        <TrendBadge value={trend} invert={invert} />
+        <TrendBadge value={trend} invert={invert} neutralDown={neutralDown} />
       </p>
+      {hint && (
+        <p className="text-[11px] font-medium text-gray-500 mt-1">{hint}</p>
+      )}
     </div>
   );
 };
@@ -134,6 +201,8 @@ const PlayerDetail = () => {
           icon={Activity}
           trend={trends.weeklyTL}
           invert={false}
+          metric="weeklyTL"
+          neutralDown
         />
         <KpiCard
           label="Monotónnost"
@@ -141,6 +210,7 @@ const PlayerDetail = () => {
           icon={Repeat}
           trend={trends.monotony}
           invert={false}
+          metric="monotony"
         />
         <KpiCard
           label="Napětí (strain)"
@@ -148,6 +218,7 @@ const PlayerDetail = () => {
           icon={Flame}
           trend={trends.strain}
           invert={false}
+          metric="strain"
         />
         <KpiCard
           label="Dotazníky"
@@ -156,6 +227,7 @@ const PlayerDetail = () => {
           icon={ClipboardCheck}
           trend={trends.reportCount}
           invert
+          metric="reportCount"
         />
       </div>
 
