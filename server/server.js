@@ -12,7 +12,6 @@ const teamsRoutes = require("./routes/teams");
 const eventRoutes = require("./routes/events");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
-// Verify required secrets exist before doing anything else.
 validateEnv();
 
 const app = express();
@@ -21,7 +20,6 @@ const app = express();
 connectDB();
 
 // Middleware
-// Restrict CORS to the known client origin (override with CLIENT_URL in production).
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use(express.json({ limit: "100kb" }));
 app.use(sanitize);
