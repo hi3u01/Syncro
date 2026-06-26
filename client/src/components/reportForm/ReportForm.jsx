@@ -16,6 +16,7 @@ const ReportForm = ({ onReportSaved }) => {
   const [selectedEventType, setSelectedEventType] = useState("");
   const [rpe, setRpe] = useState("");
   const [duration, setDuration] = useState("");
+  const [durationLocked, setDurationLocked] = useState(false);
   const [fatigue, setFatigue] = useState("");
   const [sleep, setSleep] = useState("");
   const [soreness, setSoreness] = useState("");
@@ -61,8 +62,10 @@ const ReportForm = ({ onReportSaved }) => {
       setSelectedEventType(event.type);
       if (event.plannedDuration) {
         setDuration(event.plannedDuration.toString());
+        setDurationLocked(true);
       } else {
         setDuration("");
+        setDurationLocked(false);
       }
     }
   };
@@ -195,11 +198,16 @@ const ReportForm = ({ onReportSaved }) => {
               <label className="block text-[12px] font-bold text-gray-400 !px-2 uppercase tracking-widest">
                 2. Jak dlouho trvala aktivita? (v minutách)
               </label>
+              {durationLocked && !isRestDay && (
+                <span className="!px-2 text-xs italic text-gray-400 mb-1">
+                  Délku zadal trenér, nelze ji upravit.
+                </span>
+              )}
               <input
                 type="number"
                 min="1"
                 required={!isRestDay}
-                disabled={isRestDay}
+                disabled={isRestDay || durationLocked}
                 value={isRestDay ? 0 : duration}
                 onChange={(e) => setDuration(e.target.value)}
                 className="bg-[#2a303c] w-full text-white h-10 rounded-lg !pl-2 pr-4 border-none focus-visible:ring-2 focus-visible:ring-[#5b5e36] font-medium placeholder:text-white/80 text-[15px] disabled:opacity-70 disabled:cursor-not-allowed"
