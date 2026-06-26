@@ -6,6 +6,7 @@ const {
   addDays,
   startOfWeek,
   localDateString,
+  zonedParts,
 } = require("../utils/dates");
 const { WELLNESS_KEYS } = require("../constants/validation");
 
@@ -20,7 +21,7 @@ const last7DaySeries = (reports, loadFor) => {
     const d = addDays(today, -i);
     days.push({
       dateStr: localDateString(d),
-      day: i === 0 ? "Dnes" : CZ_DAYS[d.getDay()],
+      day: i === 0 ? "Dnes" : CZ_DAYS[zonedParts(d).weekday],
       load: 0,
       type: "Volno",
       isMatch: false,
@@ -192,9 +193,10 @@ const weeklySeries = (reports, weeks) => {
     const loads = metrics.weeklyDailyLoads(reports, ws);
     const mono = metrics.monotony(loads);
     const str = metrics.strain(loads);
+    const wsParts = zonedParts(ws);
     series.push({
       weekStart: localDateString(ws),
-      label: `${ws.getDate()}.${ws.getMonth() + 1}.`,
+      label: `${wsParts.day}.${wsParts.month}.`,
       weeklyTL: metrics.weeklyTrainingLoad(loads),
       monotony: mono === null ? null : Number(mono.toFixed(2)),
       strain: str === null ? null : Math.round(str),
