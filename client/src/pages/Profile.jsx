@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { UserCircle, LogOut, Mail, Shield } from "lucide-react";
+import { UserCircle, LogOut, Mail, Shield, Users } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import { Button } from "../components/ui/button";
 
@@ -52,6 +52,19 @@ const Profile = () => {
               <p className="text-white font-medium">{roleLabel}</p>
             </div>
           </div>
+          {user?.role === "player" && (
+            <div className="flex items-center gap-3 p-4 bg-[#2a303c]/30 rounded-xl">
+              <Users size={18} className="text-gray-400" />
+              <div>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                  Tým
+                </p>
+                <p className="text-white font-medium">
+                  {user?.teamName || "Bez týmu"}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         <Button

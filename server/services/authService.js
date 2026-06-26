@@ -8,15 +8,20 @@ const generateToken = (user) =>
     expiresIn: "30d",
   });
 
-const publicUser = (user) => ({
-  _id: user._id,
-  firstName: user.firstName,
-  lastName: user.lastName,
-  email: user.email,
-  role: user.role,
-  teamId: user.teamId,
-  isActive: user.isActive,
-});
+const publicUser = (user) => {
+  // teamId may be populated (a Team doc) or a raw ObjectId/null.
+  const populated = user.teamId && user.teamId._id;
+  return {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    role: user.role,
+    teamId: populated ? user.teamId._id : user.teamId,
+    teamName: populated ? user.teamId.name : null,
+    isActive: user.isActive,
+  };
+};
 
 const register = async ({
   firstName,
@@ -49,6 +54,7 @@ const register = async ({
     teamId: assignedTeamId,
   });
 
+  await user.populate("teamId", "name");
   return { ...publicUser(user), token: generateToken(user) };
 };
 
@@ -56,7 +62,7 @@ const login = async ({ email, password }) => {
   if (typeof email !== "string" || typeof password !== "string") {
     throw new ApiError(401, "Neplatný email nebo heslo.");
   }
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).populate("teamId", "name");
   if (!user || !(await user.matchPassword(password))) {
     throw new ApiError(401, "Neplatný email nebo heslo.");
   }
