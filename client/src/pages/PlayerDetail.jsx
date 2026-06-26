@@ -1,20 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import API from "../services/api";
-import {
-  ArrowLeft,
-  Activity,
-  Repeat,
-  Flame,
-  ClipboardCheck,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-} from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import WeeklyLoadChart from "../components/dashboard/WeeklyLoadCharts";
 import MonotonyStrainChart from "../components/player/MonotonyStrainChart";
 import PlayerWellnessRadar from "../components/player/PlayerWellnessRadar";
 import ReportHistory from "../components/reports/ReportHistory";
+import InfoTooltip from "../components/ui/InfoTooltip";
 
 const fmt = (v) => (v === null || v === undefined ? "–" : v);
 
@@ -95,23 +87,20 @@ const KpiCard = ({
   label,
   value,
   suffix,
-  icon,
+  info,
   trend,
   invert,
   metric,
   neutralDown,
 }) => {
-  const Icon = icon;
   const hint = getHint(metric, value, trend);
   return (
     <div className="bg-[#1a1a1a] border border-[#2a303c] rounded-2xl p-5 shadow-lg">
-      <div className="flex justify-between items-start mb-4">
-        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-sm font-bold text-gray-300 uppercase tracking-widest">
           {label}
         </p>
-        <div className="p-2 bg-[#2a303c]/50 rounded-xl">
-          <Icon size={18} className="text-gray-300" />
-        </div>
+        <InfoTooltip text={info} />
       </div>
       <h3 className="text-3xl font-extrabold text-white tracking-tight m-0">
         {fmt(value)}
@@ -198,7 +187,7 @@ const PlayerDetail = () => {
           label="Týdenní zátěž"
           value={current.weeklyTL}
           suffix="A.U."
-          icon={Activity}
+          info="Součet denní tréninkové zátěže (RPE × minuty) za posledních 7 dní. Vyjadřuje celkové zatížení hráče v týdnu."
           trend={trends.weeklyTL}
           invert={false}
           metric="weeklyTL"
@@ -207,7 +196,7 @@ const PlayerDetail = () => {
         <KpiCard
           label="Monotónnost"
           value={current.monotony}
-          icon={Repeat}
+          info="Jednotvárnost zátěže = průměr / směrodatná odchylka denních zátěží. Vyšší hodnota znamená málo pestrý týden a vyšší riziko přetížení."
           trend={trends.monotony}
           invert={false}
           metric="monotony"
@@ -215,7 +204,7 @@ const PlayerDetail = () => {
         <KpiCard
           label="Napětí (strain)"
           value={current.strain}
-          icon={Flame}
+          info="Napětí = týdenní zátěž × monotónnost. Kombinuje objem a jednotvárnost; vysoké hodnoty signalizují riziko přetížení."
           trend={trends.strain}
           invert={false}
           metric="strain"
@@ -224,7 +213,7 @@ const PlayerDetail = () => {
           label="Dotazníky"
           value={current.reportCount}
           suffix="/ týden"
-          icon={ClipboardCheck}
+          info="Počet vyplněných dotazníků (sRPE + wellness) za poslední týden. Více dotazníků = spolehlivější data."
           trend={trends.reportCount}
           invert
           metric="reportCount"

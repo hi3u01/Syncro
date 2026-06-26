@@ -111,8 +111,11 @@ const getTeamDashboard = async (teamId) => {
   // KPI: strain spike per player (this week vs last week).
   const thisWeek = startOfWeek(new Date());
   const lastWeek = addDays(thisWeek, -7);
+  const playerName = (p) =>
+    p && p.firstName ? `${p.firstName} ${p.lastName}`.trim() : "";
+
   const byPlayer = groupByPlayer(reports);
-  let strainSpikeCount = 0;
+  const strainSpikePlayers = [];
   byPlayer.forEach((playerReports) => {
     const curStrain = metrics.strain(
       metrics.weeklyDailyLoads(playerReports, thisWeek),
@@ -120,15 +123,20 @@ const getTeamDashboard = async (teamId) => {
     const prevStrain = metrics.strain(
       metrics.weeklyDailyLoads(playerReports, lastWeek),
     );
-    if (metrics.isStrainSpike(curStrain, prevStrain)) strainSpikeCount += 1;
+    if (metrics.isStrainSpike(curStrain, prevStrain)) {
+      strainSpikePlayers.push(playerName(playerReports[0].playerId));
+    }
   });
 
   // KPI: at-risk players (any wellness param < 2.5) within the last 7 days.
   const weekAgo = addDays(startOfDay(new Date()), -7);
   const atRiskIds = new Set();
+  const atRiskNames = new Map();
   reports.forEach((r) => {
     if (metrics.reportDate(r) >= weekAgo && metrics.isReportAtRisk(r)) {
-      atRiskIds.add(String(r.playerId._id || r.playerId));
+      const id = String(r.playerId._id || r.playerId);
+      atRiskIds.add(id);
+      if (!atRiskNames.has(id)) atRiskNames.set(id, playerName(r.playerId));
     }
   });
 
@@ -160,7 +168,9 @@ const getTeamDashboard = async (teamId) => {
     kpis: {
       wellnessAvg: wellnessAvg === null ? null : Number(wellnessAvg.toFixed(1)),
       atRiskCount: atRiskIds.size,
-      strainSpikeCount,
+      atRiskPlayers: [...atRiskNames.values()].filter(Boolean),
+      strainSpikeCount: strainSpikePlayers.length,
+      strainSpikePlayers: strainSpikePlayers.filter(Boolean),
       avgRpe: {
         actual: activeRpe.length
           ? Number(metrics.mean(activeRpe).toFixed(1))
