@@ -5,7 +5,7 @@ const ApiError = require("../utils/ApiError");
 
 const generateToken = (user) =>
   jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
+    expiresIn: "1d",
   });
 
 const publicUser = (user) => {
@@ -75,4 +75,12 @@ const login = async ({ email, password }) => {
   return { ...publicUser(user), token: generateToken(user) };
 };
 
-module.exports = { register, login, generateToken, publicUser };
+const getProfile = async (userId) => {
+  const user = await User.findById(userId).populate("teamId", "name");
+  if (!user) {
+    throw new ApiError(404, "Uživatel nenalezen.");
+  }
+  return publicUser(user);
+};
+
+module.exports = { register, login, generateToken, publicUser, getProfile };

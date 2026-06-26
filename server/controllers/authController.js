@@ -11,6 +11,11 @@ const login = asyncHandler(async (req, res) => {
   res.json(result);
 });
 
+const getMe = asyncHandler(async (req, res) => {
+  const result = await authService.getProfile(req.user._id);
+  res.json(result);
+});
+
 // TODO: Implement forgotPassword and resetPassword functionality
 const forgotPassword = asyncHandler(async (req, res) => {
   res.status(501).json({ error: "Reset hesla zatím není implementován." });
@@ -20,4 +25,4 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.status(501).json({ error: "Reset hesla zatím není implementován." });
 });
 
-module.exports = { register, login, forgotPassword, resetPassword };
+module.exports = { register, login, getMe, forgotPassword, resetPassword };
